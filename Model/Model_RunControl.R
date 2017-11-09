@@ -87,11 +87,14 @@ planData_list <- get(paste0("planData_", planname))
 
 planData_list$inputs_singleValues$init.year <- planData_list$inputs_singleValues$fy_end
 planData_list$inputs_singleValues$range_age <- with(planData_list$inputs_singleValues, age_min:age_max)
-planData_list$inputs_singleValues$range_ea <- with(planData_list$inputs_singleValues, ea_min:ea_max)
+planData_list$inputs_singleValues$range_ea  <- with(planData_list$inputs_singleValues, ea_min:ea_max)
 
 
 # assign single values to working environment
-#assign_parmsList(planData_list$inputs_singleValues , envir = environment())
+# assign_parmsList(planData_list$inputs_singleValues , envir = environment())
+
+
+
 
 
 

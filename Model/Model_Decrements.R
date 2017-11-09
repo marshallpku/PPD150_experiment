@@ -50,6 +50,11 @@ decrement.model %<>%
   mutate(qxt = ifelse( (yos >= vest_yos & age >= retage_early)|(age >= retage_normal), 0, qxt)
 )
   
+# Adjustment to retirement rates
+decrement.model %<>% 
+  mutate(qxr = ifelse( (yos >= vest_yos & age >= retage_early)|(age >= retage_normal), qxr, 0)
+  )
+
 
 #*************************************************************************************************************
 #                       3. Modify retirement rates ####
@@ -72,6 +77,10 @@ decrement.model %<>% group_by(ea) %>%
 )   
          
 
+decrement.model %<>% group_by(ea) %>% 
+  mutate(qxm.term = ifelse(age<= 74, qxm.pre, qxm.post))
+
+
 
 #*************************************************************************************************************
 #                                            5. Compute various survival rates ####
@@ -79,8 +88,10 @@ decrement.model %<>% group_by(ea) %>%
 
 decrement.model %<>% 
   group_by(ea) %>% 
-  mutate( pxm.pre = 1 - qxm.pre,
-          pxm.d        = 1 - qxm.d,
+  mutate( pxm.pre  = 1 - qxm.pre,
+          pxm.post = 1 - qxm.post,
+          pxm.d    = 1 - qxm.d,
+          pxm.term = 1 - qxm.term,
           
           pxT     = 1 - qxt - qxd - qxm.pre - qxr,                            
           

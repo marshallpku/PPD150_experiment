@@ -22,9 +22,9 @@ decrement_model <- get_decrements()
 #*********************************************************************************************************
 source("./Model/Model_PrepData.R")
 
-salary       <- get_salary_proc()
-benefit      <- get_benefit()
-init_pop     <- get_initPop()
+salary        <- get_salary_proc()
+benefit       <- get_benefit()
+init_pop      <- get_initPop()
 entrants_dist <- get_entrantsDist()
 
 
@@ -40,10 +40,57 @@ pop <- get_Population()
 #*********************************************************************************************************
 #  Individual actuarial liabilities, normal costs and benenfits ####
 #*********************************************************************************************************
-source("PSERS_Model_IndivLiab.R")
 gc()
+source("./Model/Model_IndivLiab.R")
+liab <- get_indivLiab()
 
-liab <- get_indivLab()
+
+
+#*********************************************************************************************************
+# Aggregate actuarial liabilities, normal costs and benenfits ####
+#*********************************************************************************************************
+source("./Model/Model_AggLiab.R")
+AggLiab <- get_AggLiab()
+
+
+# AggLiab$active[1,]
+# AggLiab$la[1,]
+# AggLiab$term[1,]
+
+
+
+
+#*********************************************************************************************************
+# Investment Returns ####
+#*********************************************************************************************************
+source("./Model/Model_InvReturns_Temp.R")
+i.r <- gen_returns()
+
+
+
+
+#*********************************************************************************************************
+# Simulation ####
+#*********************************************************************************************************
+source("./Model/Model_Sim.R")
+penSim_results <- run_sim()
+
+
+
+
+#*********************************************************************************************************
+# Saving results ####
+#*********************************************************************************************************
+
+outputs_list <- list(planData_list = planData_list, 
+                     results     = penSim_results)
+
+
+
+
+
+
+
 
 
 
