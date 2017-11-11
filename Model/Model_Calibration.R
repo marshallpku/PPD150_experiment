@@ -36,6 +36,22 @@ get_calibAggLiab <- function( AggLiab_ = AggLiab,
     mutate_at(vars(-year, -nla), funs(.*calib_factor_actives)) 
 
     
+  #*************************************************************************************************************
+  #                                     ## Calibrating liabilities for current actives   ####
+  #************************************************************************************************************* 
+  # Use the same calibrating factor to calibrate AL for new entrants
+  
+  
+  AggLiab_actives.entrants <- 
+  AggLiab_$active.entrants %>% 
+    as.data.frame %>% 
+    mutate_at(vars(-year, -PR.sum, -EEC.sum, -nactives), funs(.*calib_factor_actives)) 
+  
+  
+  AggLiab_la.entrants <- 
+    AggLiab_$la.entrants %>% 
+    as.data.frame %>% 
+    mutate_at(vars(-year, -nla), funs(.*calib_factor_actives)) 
   
   
   
@@ -96,16 +112,22 @@ get_calibAggLiab <- function( AggLiab_ = AggLiab,
       (AggLiab_la.current.init$ALx.la.sum[j - 1] - AggLiab_la.current.init$B.la.sum[j - 1]) * (1 + i)
   }
 
-  #AggLiab_la.current.init
   
-  AggLiab_$active.current.calib        <- AggLiab_actives.current  %>% as.matrix
-  AggLiab_$active.la.carrent.new.calib <- AggLiab_la.current.new   %>% as.matrix
+  
+  #*************************************************************************************************************
+  #                                     ## Calibrating liabilities for current retirees   ####
+  #************************************************************************************************************* 
+  
+  AggLiab_$active.current.calib         <- AggLiab_actives.current  %>% as.matrix
+  AggLiab_$active.la.carrent.new.calib  <- AggLiab_la.current.new   %>% as.matrix
   AggLiab_$active.la.carrent.init.calib <-AggLiab_la.current.init  %>% as.matrix
+  AggLiab_$active.entrants.calib        <- AggLiab_actives.entrants %>% as.matrix
+  AggLiab_$la.entrants.calib            <- AggLiab_la.entrants      %>% as.matrix
   
   
   AggLiab_$active.calib <- 
   bind_rows(AggLiab_actives.current,  
-            AggLiab_$active.entrants %>% as.data.frame) %>% 
+            AggLiab_actives.entrants) %>% 
     group_by(year) %>% 
     summarise_all(funs(sum(., na.rm = TRUE))) %>% 
     as.matrix
@@ -113,7 +135,7 @@ get_calibAggLiab <- function( AggLiab_ = AggLiab,
   AggLiab_$la.calib <- 
     bind_rows(AggLiab_la.current.new ,
               AggLiab_la.current.init,
-              AggLiab_$la.entrants %>% as.data.frame) %>% 
+              AggLiab_la.entrants ) %>% 
     group_by(year) %>% 
     summarise_all(funs(sum(., na.rm = TRUE))) %>% 
     as.matrix

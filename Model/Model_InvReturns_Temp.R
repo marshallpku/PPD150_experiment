@@ -14,8 +14,8 @@ gen_returns <- function( paramlist = planData_list$inputs_singleValues
   
   
   return_type <- "simple"
-  ir.mean <-  i
   ir.sd   <- 0.12
+  ir.mean <-  i + ir.sd^2/2
   
   #set.seed(seed)
   #i.r <- matrix(rnorm(nyear  *nsim, mean = ir.mean, sd = ir.sd),nrow = nyear, ncol = nsim)

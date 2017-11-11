@@ -83,7 +83,6 @@ run_sim <- function(AggLiab_ = AggLiab,
   # which will make I(t) != Ia(t) + Ic(t) - Ib(t)
   
   
-  
   # Set up data frame
   penSim0 <- data.frame(year = init.year:(init.year + nyear - 1)) %>%
     mutate(AL   = 0, #
@@ -125,7 +124,6 @@ run_sim <- function(AggLiab_ = AggLiab,
   
   # Vector used in asset smoothing
   s.vector <- seq(0,1,length = asset_years + 1)[-(asset_years+1)]; s.vector  # a vector containing the porportion of 
-  
   
   #*************************************************************************************************************
   #                                 Defining variables in simulation  ####

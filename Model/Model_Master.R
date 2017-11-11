@@ -94,11 +94,12 @@ outputs_list <- list(planData_list = planData_list,
 # 8. Showing results ####
 #*********************************************************************************************************
 
-var_display.basic <- c("sim", "year", "FR_MA", "MA","AA", "AL", "NC", "SC", "ERC", "C", "NC_PR", "ERC_PR", 
-                       "AL.act","AL.act.v", "AL.la", "PVFB", "B", "Amort_basis")
+var_display.basic <- c("sim", "year", "FR_MA", "MA","AA", "AL", "NC", "SC","ADC","EEC",  "ERC", "C", "NC_PR", "ERC_PR", 
+                       "AL.act","AL.act.v", "AL.la", "PVFB", "B", "Amort_basis", "i.r")
 
 var_display.demo <- c("sim", "year", "nactives", "nla", "nterms")
 
+penSim_results %>% filter(sim == -1) %>% select(one_of(var_display.basic)) %>% print
 penSim_results %>% filter(sim == 0) %>% select(one_of(var_display.basic)) %>% print
 penSim_results %>% filter(sim == -1) %>% select(one_of(var_display.demo))  %>% print
 
