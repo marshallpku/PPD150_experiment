@@ -63,10 +63,12 @@ decrement.model %>%
 # initial actives
   init_actives %<>% 
     mutate(ppd_id = 93,
-           ppd_planname = "93_PA_PA_PSERS") %>% 
+           ppd_planname = "93_PA_PA_PSERS",
+           salary  = na2zero(salary),
+           nactives = na2zero(nactives)) %>% 
     ungroup %>% 
     select(ppd_id, ppd_planname, everything(), -planname)
-   
+init_actives
 
 # initial retirees
   init_retirees %<>% 

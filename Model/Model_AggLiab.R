@@ -46,7 +46,8 @@ get_AggLiab <- function( liab_ = liab,
            #PVFBx.disb.tot= PVFBx.disb * number.a,
            PVFBx.av.tot   = PVFBx.la.tot + PVFBx.v.tot, # + PVFBx.disb.tot,
            
-           PR.tot  = sx * number.a)
+           PR.tot  = sx * number.a,
+           EEC.tot = EEC * number.a)
   
   active.agg <- liab_$active %>%  
     group_by(year) %>% 
@@ -66,7 +67,8 @@ get_AggLiab <- function( liab_ = liab,
       #PVFBx.disb.sum = sum(PVFBx.disb.tot, na.rm = TRUE),
       PVFBx.av.sum   = sum(PVFBx.av.tot,   na.rm = TRUE),
       
-      PR.sum    = sum(PR.tot,  na.rm = TRUE),
+      PR.sum     = sum(PR.tot,  na.rm = TRUE),
+      EEC.sum    = sum(EEC.tot,  na.rm = TRUE),
       
       nactives  = sum(number.a,  na.rm = TRUE)) %>% 
       as.matrix # extracting elements from matrices is much faster than from data.frame
@@ -93,6 +95,7 @@ get_AggLiab <- function( liab_ = liab,
       PVFBx.av.sum   = sum(PVFBx.av.tot,   na.rm = TRUE),
       
       PR.sum    = sum(PR.tot,  na.rm = TRUE),
+      EEC.sum    = sum(EEC.tot,  na.rm = TRUE),
       
       nactives  = sum(number.a,  na.rm = TRUE)) %>% 
     as.matrix # extracting elements from matrices is much faster than from data.frame
@@ -118,14 +121,15 @@ get_AggLiab <- function( liab_ = liab,
       PVFBx.av.sum   = sum(PVFBx.av.tot,   na.rm = TRUE),
       
       PR.sum    = sum(PR.tot,  na.rm = TRUE),
+      EEC.sum    = sum(EEC.tot,  na.rm = TRUE),
       
       nactives  = sum(number.a,  na.rm = TRUE)) %>% 
     as.matrix # extracting elements from matrices is much faster than from data.frame
   
-  active.agg
-  active.agg.current
-  active.agg.entrants
-   
+  # active.agg
+  # active.agg.current
+  # active.agg.entrants
+  #  
    
   #*************************************************************************************************************
   #                                     ## Liabilities and benefits for retirees (life annuitants)   ####
@@ -150,14 +154,24 @@ get_AggLiab <- function( liab_ = liab,
     # mutate(runname = runname) %>% 
     as.matrix
   
-  la.agg.current <- liab_$la %>% 
-    filter(year - (age-ea) <= init.year) %>% 
+  la.agg.current.init <- liab_$la %>% 
+    filter(year - (age-ea) <= init.year, year.r <= init.year) %>% 
     group_by(year) %>% 
     summarise(ALx.la.sum      = sum(ALx.la.tot, na.rm = TRUE),
               B.la.sum        = sum(B.la.tot  , na.rm = TRUE),
               nla             = sum(number.la , na.rm = TRUE)) %>% 
     # mutate(runname = runname) %>% 
     as.matrix
+  
+  la.agg.current.new <- liab_$la %>% 
+    filter(year - (age-ea) <= init.year, year.r > init.year) %>% 
+    group_by(year) %>% 
+    summarise(ALx.la.sum      = sum(ALx.la.tot, na.rm = TRUE),
+              B.la.sum        = sum(B.la.tot  , na.rm = TRUE),
+              nla             = sum(number.la , na.rm = TRUE)) %>% 
+    # mutate(runname = runname) %>% 
+    as.matrix
+  
   
   la.agg.entrants <- liab_$la %>% 
     filter(year - (age-ea) > init.year) %>% 
@@ -168,10 +182,44 @@ get_AggLiab <- function( liab_ = liab,
     # mutate(runname = runname) %>% 
     as.matrix
   
-  la.agg
-  la.agg.current
+  #la.agg
+  la.agg.current.init
+  la.agg.current.new
   la.agg.entrants
-  
+
+# y <- liab_$la %>% filter(year == 2016) %>% 
+#   filter(!is.na(B.la))
+# 
+# x <-   liab_$la %>% filter(year.r == init.year,
+#                       !is.na(ALx.la)) %>%
+#     mutate(start.year = year - (age - ea)) %>% 
+#     ungroup %>% 
+#     arrange(start.year, ea, age) %>% 
+#     group_by(start.year, ea) %>% 
+#     mutate(ALx.la.tot.calc = lag(ALx.la.tot -B.la.tot) * (1+i),
+#            diff = ALx.la.tot.calc - ALx.la.tot) %>% 
+#     filter(year %in% 2016) 
+#     
+# 
+# x
+# 
+# x$ALx.la.tot %>% sum
+# x$B.la.tot   %>% sum 
+# sum((x$ALx.la.tot - x$B.la.tot)*(1+i))
+# 
+# x$ALx.la.tot %>% sum
+# 
+# y <- liab_$la %>% filter(year == 2016) %>% 
+#   summarize(tot = sum(ALx.la.tot, na.rm = T) )
+# y
+# y %>% head  
+# 
+# la.agg 
+
+
+
+
+
   #*************************************************************************************************************
   #                                 ## Liabilities and benefits for vested terms.   ####
   #*************************************************************************************************************
@@ -253,9 +301,10 @@ get_AggLiab <- function( liab_ = liab,
                    active.current  = active.agg.current,
                    active.entrants = active.agg.entrants,
                   
-                   la          = la.agg,
-                   la.current  = la.agg.current,
-                   la.entrants = la.agg.entrants,
+                   la               = la.agg,
+                   la.current.init  = la.agg.current.init,
+                   la.current.new   = la.agg.current.new,
+                   la.entrants      = la.agg.entrants,
                    
                    term          = term.agg,
                    term.current  = term.agg.current,

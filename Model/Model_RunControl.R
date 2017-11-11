@@ -93,8 +93,13 @@ planData_list$inputs_singleValues$range_ea  <- with(planData_list$inputs_singleV
 # assign single values to working environment
 # assign_parmsList(planData_list$inputs_singleValues , envir = environment())
 
+planData_list$inputs_singleValues$nyear <- 30
+planData_list$inputs_singleValues$model_term <- F
+# planData_list$decrements %<>% mutate(qxt = 0)
+# planData_list$init_retirees %<>% mutate(nretirees = 0)
+# planData_list$init_actives  %<>% mutate(nactives = 0)
 
-
+source("./Model/Model_Master.R")
 
 
 

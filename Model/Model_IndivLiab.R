@@ -185,16 +185,17 @@ liab.la <- rbind(
 ) %>%
   data.table(key = "start.year,ea,age.r,age")
 
-liab.la <- liab.la[!duplicated(liab.la %>% select(start.year, ea, age, age.r ))]
+liab.la <- liab.la[!duplicated(liab.la %>% select(start.year, ea, age, age.r))]
  
  
 liab.la <- merge(liab.la,
-                 select(liab.active, start.year, ea, age, Bx.la, COLA.scale, gx.la, sx, ax.r) %>% data.table(key = "ea,age,start.year"),
+                 select(liab.active, start.year, ea, age, Bx.la, COLA.scale, gx.la, sx) %>% data.table(key = "ea,age,start.year"),
                  all.x = TRUE, 
                  by = c("ea", "age","start.year")) %>%
            arrange(start.year, ea, age.r) %>% 
            as.data.frame %>% 
-           left_join(benefit_)
+           left_join(benefit_) %>% 
+           left_join(decrement_model_ %>% select(ea, age, pxm.post))
 
 # liab.la %>% filter(start.year == 1990, ea == 35, age.r == 62)
 
@@ -203,6 +204,7 @@ liab.la %<>% as.data.frame  %>%
   group_by(start.year, ea, age.r) %>%
   mutate(
     COLA.scale = (1 + cola)^(age - min(age)), # COLA.scale from liab.active may not cover all starting years.    
+    ax.r        = get_tla(pxm.post, i, COLA.scale),
     year   = start.year + age - ea,
     year.r = start.year + age.r - ea, # year of retirement
     Bx.la  = na2zero(Bx.la),  # just for safety
@@ -215,12 +217,15 @@ liab.la %<>% as.data.frame  %>%
   ) %>% ungroup %>%
   # select(start.year, year, ea, age, year.retire, age.retire,  B.r, ALx.r)# , ax, Bx, COLA.scale, gx.r)
   filter(year %in% seq(init.year, len = nyear) ) %>%
-  select(year, ea, age, year.r, age.r, start.year, B.la, ALx.la, sx) %>% 
+  select(year, ea, age, year.r, age.r, start.year, B.la, ALx.la, sx, ax.r, pxm.post) %>% 
   arrange(age.r, start.year, ea, age)
 
 
 # Spot check
 # liab.la %>% filter(start.year == 2016, ea == 21, age.r == 55) %>% as.data.frame()
+# liab.la %>% filter(start.year == 1961)
+
+
 
 
 #*************************************************************************************************************
@@ -238,11 +243,13 @@ liab.la %<>% as.data.frame  %>%
 #
 # CAUTION!: There will be a problem if actives entering after r.min can get vested, when PVFB is only amortized up to age r.min
 
+if(model_term){
 liab.active %<>%
   mutate(gx.v = ifelse(yos >= vest_yos, 1, 0), # actives become vested after reaching v.yos years of yos
+         # gx.v = 0,
          
-         Bx.v = ifelse(ea < retage_normal, Bx, 0), # initial annuity amount when the vested term retires at age r.vben, when a employee is vested at a certain age.
-         TCx.v   = ifelse(ea < retage_normal, Bx.v * qxt * lead(px_retage_normal_m) * v^(retage_normal - age) * ax.r[age == retage_normal], 0),               # term cost of vested termination benefits. We assume term rates are 0 after r.vben.
+         Bx.v    = ifelse(ea < retage_normal, Bx * gx.v, 0), # initial annuity amount when the vested term retires at age r.vben, when a employee is vested at a certain age.
+         TCx.v   = ifelse(ea < retage_normal, Bx.v * qxt * lead(px_retage_normal_m) * v^(retage_normal - age) * ax.vben[age == retage_normal], 0),               # term cost of vested termination benefits. We assume term rates are 0 after r.vben.
          PVFBx.v = ifelse(ea < retage_normal, c(get_PVFB(pxT[age < retage_normal], v, TCx.v[age < retage_normal]), rep(0, age_max - retage_normal + 1)), 0),  # To be compatible with the cases where workers enter after age r.min, r.max is used instead of r.min, which is used in textbook formula(winklevoss p115).
 
          
@@ -259,7 +266,14 @@ liab.active %<>%
          NCx.EAN.CP.v = ifelse(age < retage_normal, PVFBx.v[age == min(age)]/(sx[age == min(age)] * ayxs[age == retage_normal]) * sx, 0),  # for testing spreading NC.v up to r.vben
          ALx.EAN.CP.v = PVFBx.v - NCx.EAN.CP.v * axrs
   ) 
-  
+
+  } else {
+  liab.active %<>% 
+    mutate(Bx.v = 0,
+           PVFBx.v = 0,
+           NCx.EAN.CP.v = 0,
+           ALx.EAN.CP.v = 0)
+}  
 
 
 #*************************************************************************************************************
@@ -334,11 +348,14 @@ liab.term <- expand.grid(# start.year   = (init.year - (r.vben - 1 - min.age)):(
   data.table(key = "ea,age,start.year,age.term") 
 
 
-liab.term <- merge(liab.term,
-                   select(liab.active, start.year, year, ea, age, Bx.v, COLA.scale, px_retage_normal_m, ax.vben, pxm.term, ax.r) %>% data.table(key = "ea,age,start.year"),
-                   all.x = TRUE, by = c("ea", "age","start.year")) %>% as.data.frame
-             # left_join(mortality.post.model_ %>% filter(age.r == r.vben) %>% select(age, ax.r.W.term = ax.r.W))   # load present value of annuity for retirement age r.vben
 
+if(model_term){
+liab.term <- merge(liab.term,
+                   select(liab.active, start.year, year, ea, age, Bx.v, COLA.scale, px_retage_normal_m, pxm.term, ax.r) %>% data.table(key = "ea,age,start.year"),
+                   all.x = TRUE, by = c("ea", "age","start.year")) %>% 
+             left_join(decrement_model_ %>% select(ea, age, pxm.term)) %>% 
+             as.data.frame
+            
 
 liab.term %<>% as.data.frame %>%
   group_by(start.year, ea, age.term) %>%
@@ -352,13 +369,26 @@ liab.term %<>% as.data.frame %>%
                           0),  
          ALx.v = ifelse(age <  retage_normal, 
                           Bx.v[age == unique(age.term)] * ax.r[age == retage_normal] * px_retage_normal_m * v^(retage_normal - age),
-                          B.v * ax.r)
+                          B.v * ax.vben)
 
   ) %>%
   ungroup  %>%
   select(ea, age, start.year, year, year.term, B.v, ALx.v) %>%
   # select(-age.term, -Bx.v, -ax.r.W.term, -COLA.scale, -pxRm, - px_r.vben_m, -age.r, -px_r.vsuper_m, -ax.vben, -pxm.term) %>%
   filter(year %in% seq(init.year, len = nyear)) 
+
+} else {
+  liab.term %<>%
+    as.data.frame %>% 
+    group_by(start.year, ea, age.term) %>%
+    mutate(year      = start.year + (age - ea),
+           year.term = year[age == age.term],
+           B.v = 0,
+           ALx.v = 0) %>% 
+    select(ea, age, start.year, year, year.term, B.v, ALx.v) %>%
+    filter(year %in% seq(init.year, len = nyear)) 
+}
+# liab.term %>% head
 
 # 
 # liab.term <-  bind_rows(list(liab.term.init,                                  # Using rbind produces duplicated rows with unknown reasons. Use bind_rows from dplyr instead.

@@ -56,7 +56,6 @@ get_scale <- function(salgrowth_ = planData_list$salgrowth,
 
   assign_parmsList(paramlist, envir = environment()) # environment() returns the local environment of the function.
   
-  
   SS.all <- expand.grid(start.year = (1 - (age_max - age_min)):nyear, 
                         ea = range_ea, 
                         age = age_min:(retage_max - 1)) %>% 
@@ -267,14 +266,14 @@ get_entrantsDist <- function(actives   = planData_list$init_actives,
   
   nact <- actives %>% select(age, ea, nactives)
 
-  # ## Distributon by simple rule
-  # nact1 <- nact %>% filter(age - ea <= 4) %>% group_by(ea) %>% summarise(avg_ent = mean(nactives)) %>% right_join(data.frame(ea = range_ea))
-  # N <- 1
-  # while(any(is.na(nact1$avg_ent))) {
-  #   if(N <= length(nact1)) nact1 %<>% mutate(avg_ent = ifelse(is.na(avg_ent), lag(avg_ent) , avg_ent)) else
-  #     nact1 %<>% mutate(avg_ent = ifelse(is.na(avg_ent), lead(avg_ent) , avg_ent))
-  #   N <- N + 1
-  #   }
+  ## Distributon by simple rule
+  nact1 <- nact %>% filter(age - ea <= 4) %>% group_by(ea) %>% summarise(avg_ent = mean(nactives)) %>% right_join(data.frame(ea = range_ea))
+  N <- 1
+  while(any(is.na(nact1$avg_ent))) {
+    if(N <= length(nact1)) nact1 %<>% mutate(avg_ent = ifelse(is.na(avg_ent), lag(avg_ent) , avg_ent)) else
+      nact1 %<>% mutate(avg_ent = ifelse(is.na(avg_ent), lead(avg_ent) , avg_ent))
+    N <- N + 1
+    }
     
 
   nact <- splong(nact, "ea", range_ea) %>% splong("age", range_ea) %>% filter(age >= ea)

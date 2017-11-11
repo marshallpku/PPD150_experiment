@@ -23,6 +23,9 @@ run_sim <- function(AggLiab_ = AggLiab,
      nonNegC <- TRUE
      EEC_fixed <- TRUE
 
+  # use calibrated values   
+     AggLiab_$active <- AggLiab_$active.calib
+     AggLiab_$la     <- AggLiab_$la.calib
      
   
   #*************************************************************************************************************
@@ -150,7 +153,7 @@ run_sim <- function(AggLiab_ = AggLiab,
   
   
   # PVFB(j)
-  penSim0$PVFB.la <- AggLiab_$active[, "PVFBx.la.sum"]
+  penSim0$PVFB.la   <- AggLiab_$active[, "PVFBx.la.sum"]
   penSim0$PVFB.v    <- AggLiab_$active[, "PVFBx.v.sum"]
   # penSim0$PVFB.disb <- AggLiab_$active[, "PVFBx.disb.sum"] 
   penSim0$PVFB      <-  with(penSim0, PVFB.la + PVFB.v) # + PVFB.disb) #Note this is the total PVFB for actives. PVFB for retirees/beneficiaries are the same as AL.
@@ -163,7 +166,9 @@ run_sim <- function(AggLiab_ = AggLiab,
   
   # PR(j)
   penSim0$PR <- AggLiab_$active[, "PR.sum"]
-
+  
+  # EEC(j)
+  penSim0$EEC <- AggLiab_$active[, "EEC.sum"]
 
   
   # nactives, nretirees, nterms
@@ -220,20 +225,21 @@ run_sim <- function(AggLiab_ = AggLiab,
    init_amort_raw_ %<>% 
      mutate(balance = balance * factor.initAmort)
    
-
    if(useAVamort){
      SC_amort.init.list <- mapply(amort_LG, p = init_amort_raw_$balance , m = init_amort_raw_$year.remaining, method = amort_pctdol,
                                  MoreArgs = list(i = i, g = salgrowth_amort, end = FALSE), SIMPLIFY = F)
+     
+     for(j in 1:nrow(SC_amort.init)){
+       SC_amort.init[j, 1:init_amort_raw_$year.remaining[j]] <- SC_amort.init.list[[j]]
+     }
    }
-
-  # SC_amort.init
-
+  #SC_amort.init
    
   nrow.initAmort <- nrow(SC_amort.init)
-
   SC_amort0 <- rbind(SC_amort.init, SC_amort0)
   # # The amortization basis of year j should be placed in row nrow.initAmort + j - 1. 
   # # save(SC_amort0, file = "SC_amort0.RData")  
+  
   
   #*************************************************************************************************************
   #                                       Simuation  ####
