@@ -1,10 +1,6 @@
 # Master file for simulation of a single plan
 
 
-
-
-
-
 #*********************************************************************************************************
 #  Create decrement tables ####
 #*********************************************************************************************************
@@ -65,6 +61,8 @@ AggLiab <- get_AggLiab()
 source("./Model/Model_Calibration.R")
 AggLiab <- get_calibAggLiab()
 
+save(outputs_list, file = paste0("./Outputs_liab/liab_",planData_list$inputs_singleValues$ppd_planname, ".R" ) )
+
 
 #*********************************************************************************************************
 # Investment Returns ####
@@ -105,9 +103,55 @@ penSim_results %>% filter(sim == -1) %>% select(one_of(var_display.demo))  %>% p
 
 
 # Issues to fix:
- # Low growth in AL
- # Losses in sim 0, FR_MA does not rise close to 100% after 24 years.
 
+
+#*********************************************************************************************************
+# Showing results ####
+#*********************************************************************************************************
+
+save(outputs_list, file = paste0("./Outputs_funding/outputs_",planData_list$inputs_singleValues$ppd_planname, ".R" ) )
+
+
+#*********************************************************************************************************
+# Risk measures ####
+#*********************************************************************************************************
+
+df_all.stch <- penSim_results  %>% 
+  filter(sim >= 0, year <= 2046)
+
+df_all.stch %<>%   
+  select(sim, year, AL, MA, EEC, PR, ERC_PR) %>% 
+  group_by(sim) %>% 
+  mutate(FR_MA     = 100 * MA / AL,
+         FR40less  = cumany(FR_MA <= 40),
+         FR100more  = cumany(FR_MA >= 100),
+         FR100more2 = FR_MA >= 100,
+         ERC_high  = cumany(ERC_PR >= 50), 
+         ERC_hike  = cumany(na2zero(ERC_PR - lag(ERC_PR, 5) >= 10))) %>% 
+  group_by(year) %>% 
+  summarize(FR40less = 100 * sum(FR40less, na.rm = T)/n(),
+            FR100more = 100 * sum(FR100more, na.rm = T)/n(),
+            FR100more2= 100 * sum(FR100more2, na.rm = T)/n(),
+            ERC_high = 100 * sum(ERC_high, na.rm = T)/n(),
+            ERC_hike = 100 * sum(ERC_hike, na.rm = T)/n(),
+            
+            FR.q10   = quantile(FR_MA, 0.1,na.rm = T),
+            FR.q25   = quantile(FR_MA, 0.25, na.rm = T),
+            FR.q50   = quantile(FR_MA, 0.5, na.rm = T),
+            FR.q75   = quantile(FR_MA, 0.75, na.rm = T),
+            FR.q90   = quantile(FR_MA, 0.9, na.rm = T),
+            
+            ERC_PR.q10 = quantile(ERC_PR, 0.1, na.rm = T),
+            ERC_PR.q25 = quantile(ERC_PR, 0.25, na.rm = T),
+            ERC_PR.q50 = quantile(ERC_PR, 0.5, na.rm = T),
+            ERC_PR.q75 = quantile(ERC_PR, 0.75, na.rm = T),
+            ERC_PR.q90 = quantile(ERC_PR, 0.9, na.rm = T)
+            
+            
+  ) %>% 
+  ungroup()
+
+df_all.stch
 
 
 

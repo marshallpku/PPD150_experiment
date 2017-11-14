@@ -102,7 +102,7 @@ planData_list$inputs_singleValues$model_term <- F
 source("./Model/Model_Master.R")
 
 
-
+planData_list$salgrowth %>% head
 
 
 
