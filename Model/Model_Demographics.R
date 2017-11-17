@@ -15,7 +15,7 @@ get_Population <- function(init_pop_         = init_pop,
 # - range_age:        range of age
 # - nyear:            number of years in simulation
 # - wf_growth:        growth rate of the size of workforce
-# - no_entrance:      no new entrants into the workforce if set "TRUE". Overrides "wf_growth"
+# - no_entrants:      no new entrants into the workforce if set "TRUE". Overrides "wf_growth"
 # - decrement.model:  Decrement table, from Model_Decrements.R  
 # - Initial workforce for each type:
 #    - init_pop$actives:   matrix, max ea by max age
@@ -38,7 +38,7 @@ get_Population <- function(init_pop_         = init_pop,
 assign_parmsList(paramlist, envir = environment())
 
 # wf_growth   <- 0  
-# no_entrance <- FALSE
+# no_entrants <- FALSE
 
 #*************************************************************************************************************
 #                                     Creating arrays for each status ####
@@ -244,7 +244,7 @@ for (j in 1:(nyear - 1)){
   
   # Total inflow and outflow for each status
   out_active   <- active2term + active2disb + active2la + active2dead 
-  new_entrants <- calc_entrants(wf_active[, , j], wf_active[, , j] - out_active, wf_growth, dist = entrants_dist_, no.entrants = no_entrance) # new entrants
+  new_entrants <- calc_entrants(wf_active[, , j], wf_active[, , j] - out_active, wf_growth, dist = entrants_dist_, no.entrants = no_entrants) # new entrants
   
   out_term <- term2dead    # This is a 3D array 
   in_term  <- active2term  # This is a matrix

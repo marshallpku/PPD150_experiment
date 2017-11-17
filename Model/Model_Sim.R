@@ -122,8 +122,9 @@ run_sim <- function(AggLiab_ = AggLiab,
   # penSim0 <- as.list(penSim0)
   
   
+  asset_year = 1
   # Vector used in asset smoothing
-  s.vector <- seq(0,1,length = asset_years + 1)[-(asset_years+1)]; s.vector  # a vector containing the porportion of 
+  s.vector <- seq(0,1,length = asset_year + 1)[-(asset_year+1)]; s.vector  # a vector containing the porportion of 
   
   #*************************************************************************************************************
   #                                 Defining variables in simulation  ####
@@ -288,14 +289,14 @@ run_sim <- function(AggLiab_ = AggLiab,
         penSim$MA[j]  <- with(penSim, MA[j - 1] + I.r[j - 1] + C[j - 1] - B[j - 1])
         penSim$EAA[j] <- with(penSim, AA[j - 1] + I.e[j - 1] + C[j - 1] - B[j - 1])
         penSim$AA[j]  <- switch(smooth_method,
-                                method1 = with(penSim, MA[j] - sum(s.vector[max(asset_years + 2 - j, 1):asset_years] * I.dif[(j-min(j, asset_years + 1)+1):(j-1)])),
+                                method1 = with(penSim, MA[j] - sum(s.vector[max(asset_year + 2 - j, 1):asset_year] * I.dif[(j-min(j, asset_year + 1)+1):(j-1)])),
                                 method2 = with(penSim, (1 - w) * EAA[j] + w * MA[j]) 
         )
       }
       
       
       ## Initial unrecognized returns
-      if((init_AA %in% c("AL_pct", "AA0")) & k != -1){
+      if((init_AA %in% c("AL_pct", "AA0")) & k != -1 & asset_year != 1){
 
         # Adjusting initila unrecognized returns
         init_unrecReturns.adj <-  mutate(init_unrecReturns.unadj_, DeferredReturn = DeferredReturn * (penSim$MA[1] - penSim$AA[1])/sum(DeferredReturn),
@@ -346,7 +347,7 @@ run_sim <- function(AggLiab_ = AggLiab,
       # Supplemental cost in j
       penSim$SC[j] <- switch(amort_openclosed,
                              closed = sum(SC_amort[, j]),
-                             open   = amort_LG(penSim$UAAL[j], i, amort_year, salgrowth_amort, end = FALSE, method = amort_method)[1])
+                             open   = amort_LG(penSim$UAAL[j], i, amort_year, salgrowth_amort, end = FALSE, method = amort_pctdol)[1])
       
       
       # penSim$EEC[j] <- 
@@ -431,7 +432,9 @@ run_sim <- function(AggLiab_ = AggLiab,
   
   penSim_results <- bind_rows(penSim_results) %>% 
     mutate(ppd_id  = ppd_id,
-           ppd_planname = ppd_planname,
+           planName = planName,
+           plantype = plantype,
+           State    = StateAbbrev,
            sim     = rep(-1:nsim, each = nyear),
            FR      = 100 * AA / exp(log(AL)),
            FR_MA   = 100 * MA / exp(log(AL)),
@@ -457,7 +460,7 @@ run_sim <- function(AggLiab_ = AggLiab,
            PR.growth = ifelse(year > 1, 100 * (PR / lag(PR) - 1), NA)
            
            ) %>%
-    select(ppd_id, ppd_planname, sim, year, everything())
+    select(ppd_id, planName, plantype, State, sim, year, everything())
   
   return(penSim_results)
   

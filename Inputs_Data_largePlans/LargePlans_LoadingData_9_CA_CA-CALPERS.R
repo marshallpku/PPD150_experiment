@@ -322,6 +322,9 @@ data_largePlan <- list(
 
 save(data_largePlan, file = paste0(data_dir, "DataLargePlan_", planname,  ".RData"))
 
+x <- data_largePlan$ActivesSched %>% filter(fillin == T)
+
+x$nactives %>% sum
 
 
 

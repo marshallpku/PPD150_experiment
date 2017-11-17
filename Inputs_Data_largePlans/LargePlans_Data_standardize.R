@@ -720,6 +720,7 @@ largePlans_termRates_Matrix <-
               select(-plantype, -TermRatesType))
 #largePlans_TermRates_Matrix
 
+
 # by age  
 largePlans_termRates_byAge <- 
   expand.grid(planname = plannames_termrate_byAge, ea = 20:74, age = 20:74) %>% 
@@ -741,8 +742,8 @@ largePlans_termRates_byYOS <-
   left_join(df_largePlans_types %>% select(planname, plantype, TermRatesType)) %>% 
   left_join(dataList_allPlans2$TermRatesSched %>% 
               filter(TermRatesType == "byYOS") %>% 
-              select(-ea, -age, -plantype, -TermRatesType))
-# largePlans_retRates_byYOS
+              select(-plantype, -TermRatesType))
+
 
 
 # Merging all types and adding weights

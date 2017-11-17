@@ -294,7 +294,7 @@ splong<-function(df,fillvar,fitrange=NULL, method = "natural"){
   return(dfl2)
 }
 
-
+# spline(1:6, c(2, 3, NA, 4, 5, NA), xout = 1:6)
 
 
 

@@ -171,14 +171,18 @@ source("Functions.R")
 
 #################################################################
 
+dir_std_data <- "./Inputs_Data_std/"
+
+# Mortality from RP2014
+source(paste0(dir_std_data, "Data_standardization_Mortality.R"))
 
 
-#**************************************************
-#                Loading data                  ####
-#**************************************************
+# Standardized data for 15 large plans
+source(paste0(dir_std_data, "Data_standardization_largePlans.R"))
 
 
-
+# Standardized data for small plans
+source(paste0(dir_std_data, "Data_standardization_smallPlans.R"))
 
 
 

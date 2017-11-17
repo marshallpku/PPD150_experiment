@@ -73,36 +73,66 @@ source("Functions.R")
 
 
 
+#********************************************************************************                          
+#                  Global settings ####
 #********************************************************************************
-#                            Loading standardized data file ####
+
+dir_data_std        <- "./Inputs_Data_std/planData_std/"
+dir_outputs_liab    <- "./Outputs_liab/"
+dir_outputs_funding <- "./Outputs_funding/"
+
+
+
+#********************************************************************************                          
+#                  Model: Liabilities and cash flow ####
 #********************************************************************************
 
-dir_data_std <- "./Inputs_Data_std/"
-planname     <- "93_PA_PA_PSERS"
+model_ppd_id <- 31
+liabScn      <- "a" 
 
+dir_out <- paste0(dir_outputs_liab, "liabScn_", liabScn, "/" )
+if(!dir.exists(dir_out)) dir.create(dir_out)
 
-load(paste0(dir_data_std, "planData_", planname, ".RData"))
-planData_list <- get(paste0("planData_", planname))
+load(paste0(dir_data_std, "planData_std_", model_ppd_id, ".RData"))
 
+planData_list <- get(paste0("planData_std_", model_ppd_id ))
 
+# Temp: global/model variables
+planData_list$inputs_singleValues$liabScn <- liabScn
+planData_list$inputs_singleValues$ncore   <- 6
+planData_list$inputs_singleValues$nsim    <- 2000
+planData_list$inputs_singleValues$nyear   <- 30
+planData_list$inputs_singleValues$age_min <- 20
+planData_list$inputs_singleValues$age_max <- 110
+planData_list$inputs_singleValues$ea_min  <- 20
+planData_list$inputs_singleValues$ea_max  <- 74
+planData_list$inputs_singleValues$no_entrants <- FALSE
+planData_list$inputs_singleValues$wf_growth   <- 0
+planData_list$inputs_singleValues$model_term  <- FALSE
+
+# Derived values
 planData_list$inputs_singleValues$init.year <- planData_list$inputs_singleValues$fy_end
 planData_list$inputs_singleValues$range_age <- with(planData_list$inputs_singleValues, age_min:age_max)
 planData_list$inputs_singleValues$range_ea  <- with(planData_list$inputs_singleValues, ea_min:ea_max)
 
 
+
 # assign single values to working environment
 # assign_parmsList(planData_list$inputs_singleValues , envir = environment())
 
-planData_list$inputs_singleValues$nyear <- 30
-planData_list$inputs_singleValues$model_term <- F
+
 # planData_list$decrements %<>% mutate(qxt = 0)
 # planData_list$init_retirees %<>% mutate(nretirees = 0)
 # planData_list$init_actives  %<>% mutate(nactives = 0)
 
-source("./Model/Model_Master.R")
+
+#********************************************************************************                          
+#                  Model: Investment and funding ####
+#********************************************************************************
 
 
-planData_list$salgrowth %>% head
+source("./Model/Model_Master_liab.R")
+
 
 
 

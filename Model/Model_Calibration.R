@@ -140,6 +140,11 @@ get_calibAggLiab <- function( AggLiab_ = AggLiab,
     summarise_all(funs(sum(., na.rm = TRUE))) %>% 
     as.matrix
 
+  AggLiab_$calib_factor_actives <- calib_factor_actives
+  AggLiab_$calib_factor_benY1   <- calib_factor_benY1
+  AggLiab_$calib_g              <- g
+  
+  
   return(AggLiab_)
 
 }

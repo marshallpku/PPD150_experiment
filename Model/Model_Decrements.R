@@ -29,10 +29,10 @@ decrement.model <- expand.grid(age = range_age, ea = range_ea) %>%
   filter(age >= ea) %>% 
   left_join(decrements) %>% 
   mutate(ppd_id = ppd_id,
-         ppd_planname = ppd_planname,
+         # planName = planName,
          yos = age - ea) %>% 
   colwise(na2zero)(.) %>% 
-  select(ppd_id, ppd_planname, ea, age, yos, everything())
+  select(ppd_id, ea, age, yos, everything())
   
 # decrement.model
 
@@ -45,6 +45,16 @@ decrement.model <- expand.grid(age = range_age, ea = range_ea) %>%
 # 2. Coerce termination rates to 0 when 
   # vested and eligible for early retirement or 
   # eligible for full retirement no matter vested or not. 
+
+
+decrement.model %<>% 
+  group_by(ea) %>% 
+  mutate(qxm.pre  = ifelse(age ==  age_max, 1, qxm.pre),
+         qxm.post = ifelse(age ==  age_max, 1, qxm.post),
+         qxm.d    = ifelse(age ==  age_max, 1, qxm.d),
+         qxm.term = ifelse(age ==  age_max, 1, qxm.term))
+
+
 
 decrement.model %<>% 
   mutate(qxt = ifelse( (yos >= vest_yos & age >= retage_early)|(age >= retage_normal), 0, qxt)
@@ -79,6 +89,7 @@ decrement.model %<>% group_by(ea) %>%
 
 decrement.model %<>% group_by(ea) %>% 
   mutate(qxm.term = ifelse(age<= 74, qxm.pre, qxm.post))
+
 
 
 

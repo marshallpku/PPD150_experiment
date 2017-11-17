@@ -380,19 +380,35 @@ PPD_data <-
   select(ppd_id, planName, StateAbbrev, plantype, year_AL,  everything())
 
 
-save(PPD_data, file = "./Inputs_Data_PPD/DataPPD.RData")
 
 
-PPD_data$amort_pctdol_ppd
-
-
+# PPD_data$amort_pctdol_ppd
 
 
 
 
 
+#****************************************************************************************************
+#                PPD data for calculating initial amortization basis                             ####
+#****************************************************************************************************
+
+PPD_data_forInitAmort <- 
+  ppd %>% 
+  select(ppd_id, PlanName, fy, 
+         NormCostRate_tot, ReqContRate_tot, 
+         NormCostAmount_ER,ReqContRate_ER,
+         UAAL_GASB, payroll, 
+         NormCostAmount_tot, ReqContAmount_tot) %>% 
+  mutate(UAAL_GASB = UAAL_GASB * 1000,
+         payroll   = payroll * 1000 )
 
 
+
+#****************************************************************************************************
+#                              save results                                                      ####
+#****************************************************************************************************
+
+save(PPD_data, PPD_data_forInitAmort, file = "./Inputs_Data_PPD/DataPPD.RData")
 
 
 
