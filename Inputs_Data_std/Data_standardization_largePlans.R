@@ -237,11 +237,12 @@ PPDsingleValues_forLargePlans <-
 # Temp: use temparary values before checking AV CAFR for actual values
 PPDsingleValues_forLargePlans %<>% 
   mutate(amort_openclosed = ifelse(is.na(amort_openclosed), "open", amort_openclosed),
-         amort_year       = ifelse(is.na(amort_year), 15, amort_year),
-         asset_year       = ifelse(is.na(asset_year), 5, asset_year))
+         amort_year       = ifelse(is.na(amort_year), 25, amort_year),
+         asset_year       = ifelse(is.na(asset_year), 5, asset_year),
+         amort_openclosed = ifelse(amort_openclosed == "fixed", "closed", amort_openclosed))
 
 
-
+# PPDsingleValues_forLargePlans
 
 
 
@@ -311,7 +312,9 @@ decrements <- expand.grid(planname = planNames_all, age = 20:110, ea = 20:74) %>
 
 # decrements %>% filter(ea == 20, age ==20)
 
-
+# decrements %>% filter(planname == "9_CA_CA-CALPERS")
+# 
+# largePlans_dataOutputs$largePlans_termRates_byPlan %>% select(planname, plantype, ea, age, qxt = termrate)%>% filter(planname == "9_CA_CA-CALPERS")
 
 inputs_singleValues_largePlans_num <- 
 largePlans_dataOutputs$largePlans_singleValues_num %>% 
@@ -374,7 +377,9 @@ inputsSingleValues <-
   mutate(benProv_join  = "benProv_join") %>% 
   left_join(singleValues_benefitProv_backup) %>% 
   select(-benProv_join) %>% 
-  mutate(fy_end = FY)
+  mutate(fy_end = FY, 
+         retage_early = ifelse(plantype == "safety", retage_early - 5, retage_early),
+         retage_normal= ifelse(plantype == "safety", retage_normal- 5, retage_normal))
 
 # inputsSingleValues %>% names
 # inputsSingleValues %>% 
@@ -695,7 +700,7 @@ assign(paste0("planData_std_", ppd_id_select),
 
 }
 
-sapply(as.numeric(str_extract(planNames_all, "\\d+")), get_planData)
+l_ply(as.numeric(str_extract(planNames_all, "\\d+")), get_planData)
 
 # load("./Inputs_Data_std/planData_std/planData_std_9.RData")
 # planData_std_9$init_unrecReturns

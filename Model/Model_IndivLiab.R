@@ -123,7 +123,7 @@ liab.active <-
 
 # Calculate normal costs and liabilities of retirement benefits with multiple retirement ages  
 liab.active %<>%   
-  mutate( gx.la = ifelse(yos < vest_yos, 0,  
+  mutate( gx.la = ifelse(yos < ret_yos, 0,  
                          ifelse(age > retage_normal, 1, 
                                 ifelse(age %in% retage_early:retage_normal, 1 - (retage_normal - age) * earlyRet_reduction, 0))), # reduction factor for early retirement benefits. Early retirement has a penalty factor on benefit. 
           # gx.laca = 0,

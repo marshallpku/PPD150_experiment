@@ -62,7 +62,7 @@ decrement.model %<>%
   
 # Adjustment to retirement rates
 decrement.model %<>% 
-  mutate(qxr = ifelse( (yos >= vest_yos & age >= retage_early)|(age >= retage_normal), qxr, 0)
+  mutate(qxr = ifelse( (yos >= ret_yos & age >= retage_early)|(age >= retage_normal), qxr, 0)
   )
 
 

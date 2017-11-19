@@ -8,7 +8,7 @@
 get_Population <- function(init_pop_         = init_pop,
                            entrants_dist_    = entrants_dist,
                            decrement_model_  = decrement_model$decrement.model,
-                           paramlist        = planData_list$inputs_singleValues){
+                           paramlist         = planData_list$inputs_singleValues){
 
 ## Inputs
 # - range_ea:         all possible entry ages  

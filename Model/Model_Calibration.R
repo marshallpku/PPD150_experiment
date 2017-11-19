@@ -2,7 +2,8 @@
 
 
 get_calibAggLiab <- function( AggLiab_ = AggLiab, 
-                              paramlist = planData_list$inputs_singleValues){
+                              paramlist = planData_list$inputs_singleValues,
+                              planData_list_ = planData_list){
   
   
   # Run the section below when developing new features.  
@@ -144,6 +145,7 @@ get_calibAggLiab <- function( AggLiab_ = AggLiab,
   AggLiab_$calib_factor_benY1   <- calib_factor_benY1
   AggLiab_$calib_g              <- g
   
+  AggLiab_$planData_list <- planData_list_
   
   return(AggLiab_)
 

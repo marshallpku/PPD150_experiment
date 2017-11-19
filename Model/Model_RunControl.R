@@ -77,49 +77,70 @@ source("Functions.R")
 #                  Global settings ####
 #********************************************************************************
 
+dir_data_ppd        <- "./Inputs_Data_PPD/"
 dir_data_std        <- "./Inputs_Data_std/planData_std/"
 dir_outputs_liab    <- "./Outputs_liab/"
-dir_outputs_funding <- "./Outputs_funding/"
+dir_outputs_sim     <- "./Outputs_sim/"
 
+file_Scn_liab <- "./Model/Scn_liab.xlsx"
+df_liabScn    <- read_ExcelRange(file_Scn_liab, sheet = "liabScn" )
+
+file_Scn_return <- "./Model/Scn_return.xlsx"
+df_returnScn    <- read_ExcelRange(file_Scn_return, sheet = "returnScn" )
+
+
+
+file_ppd <- "DataPPD.RData"
+load(paste0(dir_data_ppd, file_ppd))
+
+ppd_id_all        <- PPD_data$ppd_id
+ppd_id_largePlans <- c(9, 26, 83, 85, 125,
+                       72, 84, 86, 140, 150,
+                       10, 28, 78, 88, 108) 
+ppd_id_smallPlans <- setdiff(ppd_id_all, ppd_id_largePlans)
 
 
 #********************************************************************************                          
 #                  Model: Liabilities and cash flow ####
 #********************************************************************************
 
-model_ppd_id <- 31
-liabScn      <- "a" 
+model_ppd_id  <-  ppd_id_all
+model_liabScn <- "A1"
 
-dir_out <- paste0(dir_outputs_liab, "liabScn_", liabScn, "/" )
+for(model_ppd_id_ in model_ppd_id){
+  # model_ppd_id_  <- 9
+  # model_liabScn_ <- "A1"
+  
+# set output folder
+dir_out <- paste0(dir_outputs_liab, "liabScn_", model_liabScn, "/" )
 if(!dir.exists(dir_out)) dir.create(dir_out)
 
-load(paste0(dir_data_std, "planData_std_", model_ppd_id, ".RData"))
+# load plan data
+load(paste0(dir_data_std, "planData_std_", model_ppd_id_, ".RData"))
+planData_list <- get(paste0("planData_std_", model_ppd_id_ ))
 
-planData_list <- get(paste0("planData_std_", model_ppd_id ))
+# load scenario data
+list_liabScn <- df_liabScn %>% filter(liabScn == model_liabScn) %>% unclass
 
-# Temp: global/model variables
-planData_list$inputs_singleValues$liabScn <- liabScn
-planData_list$inputs_singleValues$ncore   <- 6
-planData_list$inputs_singleValues$nsim    <- 2000
-planData_list$inputs_singleValues$nyear   <- 30
-planData_list$inputs_singleValues$age_min <- 20
-planData_list$inputs_singleValues$age_max <- 110
-planData_list$inputs_singleValues$ea_min  <- 20
-planData_list$inputs_singleValues$ea_max  <- 74
-planData_list$inputs_singleValues$no_entrants <- FALSE
-planData_list$inputs_singleValues$wf_growth   <- 0
-planData_list$inputs_singleValues$model_term  <- FALSE
+# combine data
+planData_list$inputs_singleValues <- 
+  c(list_liabScn, planData_list$inputs_singleValues)
+
 
 # Derived values
 planData_list$inputs_singleValues$init.year <- planData_list$inputs_singleValues$fy_end
 planData_list$inputs_singleValues$range_age <- with(planData_list$inputs_singleValues, age_min:age_max)
 planData_list$inputs_singleValues$range_ea  <- with(planData_list$inputs_singleValues, ea_min:ea_max)
 
+# browser()
+
+source("./Model/Model_Master_liab.R")
+}
+
 
 
 # assign single values to working environment
 # assign_parmsList(planData_list$inputs_singleValues , envir = environment())
-
 
 # planData_list$decrements %<>% mutate(qxt = 0)
 # planData_list$init_retirees %<>% mutate(nretirees = 0)
@@ -130,12 +151,80 @@ planData_list$inputs_singleValues$range_ea  <- with(planData_list$inputs_singleV
 #                  Model: Investment and funding ####
 #********************************************************************************
 
+model_sim_liabScn <- "A1"
 
-source("./Model/Model_Master_liab.R")
+# model_sim_returnScn <- "planAssumption"
+# model_sim_returnScn <- "return75"
+# model_sim_returnScn <- "lowReturn15y"
+# model_sim_returnScn <- "highVol"
+model_sim_returnScn <- c("planAssumption", "return75", "lowReturn15y", "highVol")
 
 
+# model_sim_ppd_id <- ppd_id_largePlans[10:15] 
+model_sim_ppd_id <- ppd_id_all 
 
 
+for(model_sim_returnScn_ in model_sim_returnScn){
+  #model_sim_returnScn <- "lowReturn15y"
+  for(model_sim_ppd_id_ in model_sim_ppd_id){
+    # model_sim_ppd_id_  <- 9
+    # model_sim_liabScn <- "A1"
+  
+  # set output folder
+  dir_sim_out <- paste0(dir_outputs_sim, "simScn_", model_sim_liabScn,"_", model_sim_returnScn_, "/" )
+  if(!dir.exists(dir_sim_out)) dir.create(dir_sim_out)
+  
+  # load liability data and plan data list
+  load(paste0(dir_outputs_liab, "liabScn_", model_sim_liabScn, "/liab_", model_sim_liabScn, "_", model_sim_ppd_id_, ".RData")) # AggLiab loaded
+  AggLiab$planData_list$inputs_singleValues$returnScn <- model_sim_returnScn_
+  planData_list <- AggLiab$planData_list
+  
+  planData_list$init_amort_unadj
+  
+  
+   
+model_sim_liabScn <- "A1"
+
+#model_sim_returnScn <- "planAssumption"
+#model_sim_returnScn <- "return75"
+model_sim_returnScn <- "lowReturn15y"
+#model_sim_returnScn <- "highVol"
+
+# model_sim_ppd_id <- ppd_id_largePlans[10:15] 
+model_sim_ppd_id <- ppd_id_smallPlans[-(1:39)] 
 
 
+for(model_sim_returnScn_ in model_sim_returnScn){
+  #model_sim_returnScn <- "lowReturn15y"
+  for(model_sim_ppd_id_ in model_sim_ppd_id){
+    # model_sim_ppd_id_  <- 9
+    # model_sim_liabScn <- "A1"
+  
+  # set output folder
+  dir_sim_out <- paste0(dir_outputs_sim, "simScn_", model_sim_liabScn,"_", model_sim_returnScn_, "/" )
+  if(!dir.exists(dir_sim_out)) dir.create(dir_sim_out)
+  
+  # load liability data and plan data list
+  load(paste0(dir_outputs_liab, "liabScn_", model_sim_liabScn, "/liab_", model_sim_liabScn, "_", model_sim_ppd_id_, ".RData")) # AggLiab loaded
+  AggLiab$planData_list$inputs_singleValues$returnScn <- model_sim_returnScn_
+  planData_list <- AggLiab$planData_list
+  
+  planData_list$init_amort_unadj
+  
+  
+   
+  # load return scenario data
+  returnScn_sim <- df_returnScn %>% filter(returnScn == model_sim_returnScn_) 
+  
+  
+  source("./Model/Model_Master_sim.R")
+  }
+}
+  # load return scenario data
+  returnScn_sim <- df_returnScn %>% filter(returnScn == model_sim_returnScn_) 
+  
+  
+  source("./Model/Model_Master_sim.R")
+  }
+}
 

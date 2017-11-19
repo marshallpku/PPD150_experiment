@@ -122,7 +122,6 @@ run_sim <- function(AggLiab_ = AggLiab,
   # penSim0 <- as.list(penSim0)
   
   
-  asset_year = 1
   # Vector used in asset smoothing
   s.vector <- seq(0,1,length = asset_year + 1)[-(asset_year+1)]; s.vector  # a vector containing the porportion of 
   
@@ -184,6 +183,9 @@ run_sim <- function(AggLiab_ = AggLiab,
   #                                  Setting up initial amortization payments ####
   #*************************************************************************************************************  
   
+  init_amort_raw_ %<>% filter(year.remaining >0)
+  if(amort_pctdol == "pct") amort_pctdol <- "cp"
+  
   # matrix representation of amortization: better visualization but larger size
   amort_year_max <- max(init_amort_raw_$year.remaining, amort_year)
   SC_amort0      <- matrix(0, nyear +  amort_year_max, nyear + amort_year_max)
@@ -233,6 +235,9 @@ run_sim <- function(AggLiab_ = AggLiab,
      }
    }
   #SC_amort.init
+   
+  # amort_LG(p = 364439063, m = 10, end = FALSE, method = "cp", i = 0.0725, g =  0.03707692) %>% print
+   
    
   nrow.initAmort <- nrow(SC_amort.init)
   SC_amort0 <- rbind(SC_amort.init, SC_amort0)
@@ -435,6 +440,8 @@ run_sim <- function(AggLiab_ = AggLiab,
            planName = planName,
            plantype = plantype,
            State    = StateAbbrev,
+           liabScn  = liabScn,
+           returnScn= returnScn,
            sim     = rep(-1:nsim, each = nyear),
            FR      = 100 * AA / exp(log(AL)),
            FR_MA   = 100 * MA / exp(log(AL)),

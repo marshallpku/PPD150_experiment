@@ -576,6 +576,11 @@ largePlans_retRates_byAge <-
   mutate(yos = age - ea)
 # largePlans_retRates_byAge
 
+
+dataList_allPlans2$RetRatesSched %>% 
+  filter(RetRatesType == "byAge") %>% 
+  select(-ea, -yos, -plantype, RetRatesType)
+
 # by YOS
 largePlans_retRates_byYOS <- 
   expand.grid(planname = plannames_retrate_byYOS, ea = 20:74, age = 20:74) %>% 
@@ -729,9 +734,9 @@ largePlans_termRates_byAge <-
   left_join(df_largePlans_types %>% select(planname, plantype, TermRatesType)) %>% 
   left_join(dataList_allPlans2$TermRatesSched %>% 
               filter(TermRatesType == "byAge") %>% 
-              select(-ea, -yos, -plantype, -TermRatesType)) %>% 
+              select(-yos, -plantype, -TermRatesType)) %>% 
   mutate(yos = age - ea)
-# largePlans_salaryScale_byAge
+ 
 
 # by YOS
 largePlans_termRates_byYOS <- 

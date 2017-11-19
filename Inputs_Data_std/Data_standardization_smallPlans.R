@@ -266,32 +266,46 @@ PPDsingleValues_forSmallPlans <-
 #**************************************************************************************
 #         Fill missing values with backup values (except AL_act, AL_retired)       ####
 #**************************************************************************************
+
+
 # varialbes that need backup value:
  # infl, asset_year, amort_openclosed, amort_pctdol, amort_year, EEC_pct.current,  EEC_pct.current, EEC_pct.entrants
+
+
+# Productivity growth: calc from large plans
+data_dir_largePlans  <- "./Inputs_Data_largePlans/"
+file_name <- "largePlans_dataOutputs.RData"
+load(paste0(data_dir_largePlans, file_name))
+prod_fill <- (largePlans_dataOutputs$largePlans_singleValues_num %>% filter(varname == "prod_growth"))$value %>% mean(na.rm = TRUE)
+
 
 # Temp: use temparary values before checking AV CAFR for actual values
 PPDsingleValues_forSmallPlans%<>% 
   mutate(infl = ifelse(is.na(infl), mean(infl, na.rm = TRUE), infl), 
          
-         amort_pctdol     = ifelse(is.na(amort_pctdol), "open", amort_pctdol),
-         amort_openclosed = ifelse(is.na(amort_openclosed), "open", amort_openclosed),
-         amort_year       = ifelse(is.na(amort_year), 15, amort_year),
-         asset_year       = ifelse(is.na(asset_year), 5, asset_year),
+         amort_pctdol     = ifelse(is.na(amort_pctdol), "cp", amort_pctdol),
+         amort_openclosed = ifelse(is.na(amort_openclosed), "closed", amort_openclosed),
+         amort_year       = ifelse(is.na(amort_year), 25, amort_year),
+         asset_year       = ifelse(is.na(asset_year), 5,  asset_year),
          
          EEC_pct.current = ifelse(is.na(EEC_pct.current), mean(EEC_pct.current, na.rm = TRUE), EEC_pct.current ), 
          EEC_pct.entrants= EEC_pct.current,
          
-         prod = 0.0075,
+         prod = prod_fill,
          
          startingSal_growth = infl + prod,
          salgrowth_amort    = infl + prod,
          
-         amort_year = ifelse(ppd_id == 101, 20, amort_year) # South Dakota RS see AV2016 n60. (Frozen EAN)
+         amort_year = ifelse(ppd_id == 101, 20, amort_year), # South Dakota RS see AV2016 n60. (Frozen EAN)
+         amort_openclosed = ifelse(amort_openclosed == "fixed", "closed", amort_openclosed)
+         
          
          )
 
 # PPDsingleValues_forSmallPlans %>%
 #  summarise_all(funs(sum(!is.na(.))))
+
+PPDsingleValues_forSmallPlans %>% select(ppd_id, amort_pctdol)
 
 #**************************************************************************************
 #                Use NMR values for benefit provisions                             ####
@@ -314,7 +328,9 @@ inputsSingleValues_smallPlans <-
   PPDsingleValues_forSmallPlans %>% 
   mutate(benProv_join  = "benProv_join") %>% 
   left_join(singleValues_benefitProv_backup) %>% 
-  select(-benProv_join) 
+  select(-benProv_join) %>% 
+  mutate(retage_early = ifelse(plantype == "safety", retage_early - 5, retage_early),
+         retage_normal= ifelse(plantype == "safety", retage_normal-5, retage_normal))
 
 
 #**************************************************************************************
@@ -538,7 +554,7 @@ get_planData <- function(ppd_id_select){
   
 }
 
-sapply(planid_small, get_planData)
+l_ply(planid_small, get_planData)
 
 # load("./Inputs_Data_std/planData_std/planData_std_9.RData")
 # planData_std_9$init_unrecReturns
