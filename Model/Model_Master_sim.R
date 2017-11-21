@@ -142,7 +142,7 @@ outputs_list <- list(planData_list = planData_list,
 
 save(outputs_list, file = paste0(dir_sim_out, "sim_", 
                                  model_sim_liabScn,"_", 
-                                 model_sim_returnScn, "_", 
+                                 model_sim_returnScn_, "_", 
                                  planData_list$inputs_singleValues$ppd_id, 
                                  ".RData" ) )
 

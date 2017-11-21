@@ -153,45 +153,15 @@ source("./Model/Model_Master_liab.R")
 
 model_sim_liabScn <- "A1"
 
-# model_sim_returnScn <- "planAssumption"
-# model_sim_returnScn <- "return75"
-# model_sim_returnScn <- "lowReturn15y"
-# model_sim_returnScn <- "highVol"
-model_sim_returnScn <- c("planAssumption", "return75", "lowReturn15y", "highVol")
-
-
-# model_sim_ppd_id <- ppd_id_largePlans[10:15] 
-model_sim_ppd_id <- ppd_id_all 
-
-
-for(model_sim_returnScn_ in model_sim_returnScn){
-  #model_sim_returnScn <- "lowReturn15y"
-  for(model_sim_ppd_id_ in model_sim_ppd_id){
-    # model_sim_ppd_id_  <- 9
-    # model_sim_liabScn <- "A1"
-  
-  # set output folder
-  dir_sim_out <- paste0(dir_outputs_sim, "simScn_", model_sim_liabScn,"_", model_sim_returnScn_, "/" )
-  if(!dir.exists(dir_sim_out)) dir.create(dir_sim_out)
-  
-  # load liability data and plan data list
-  load(paste0(dir_outputs_liab, "liabScn_", model_sim_liabScn, "/liab_", model_sim_liabScn, "_", model_sim_ppd_id_, ".RData")) # AggLiab loaded
-  AggLiab$planData_list$inputs_singleValues$returnScn <- model_sim_returnScn_
-  planData_list <- AggLiab$planData_list
-  
-  planData_list$init_amort_unadj
-  
-  
-   
-model_sim_liabScn <- "A1"
-
 #model_sim_returnScn <- "planAssumption"
 #model_sim_returnScn <- "return75"
-model_sim_returnScn <- "lowReturn15y"
+#model_sim_returnScn <- "lowReturn15y"
 #model_sim_returnScn <- "highVol"
+model_sim_returnScn <- c("lowReturn15y", "return75")
 
-# model_sim_ppd_id <- ppd_id_largePlans[10:15] 
-model_sim_ppd_id <- ppd_id_smallPlans[-(1:39)] 
+# model_sim_ppd_id <- ppd_id_largePlans 
+# model_sim_ppd_id <- ppd_id_smallPlans 
+model_sim_ppd_id   <- ppd_id_all
 
 
 for(model_sim_returnScn_ in model_sim_returnScn){
@@ -220,11 +190,6 @@ for(model_sim_returnScn_ in model_sim_returnScn){
   source("./Model/Model_Master_sim.R")
   }
 }
-  # load return scenario data
-  returnScn_sim <- df_returnScn %>% filter(returnScn == model_sim_returnScn_) 
-  
-  
-  source("./Model/Model_Master_sim.R")
-  }
-}
+
+
 

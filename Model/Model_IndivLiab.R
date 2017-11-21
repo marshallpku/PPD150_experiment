@@ -203,7 +203,7 @@ liab.la <- merge(liab.la,
 liab.la %<>% as.data.frame  %>% 
   group_by(start.year, ea, age.r) %>%
   mutate(
-    COLA.scale = (1 + cola)^(age - min(age)), # COLA.scale from liab.active may not cover all starting years.    
+    COLA.scale  = (1 + cola)^(age - min(age)), # COLA.scale from liab.active may not cover all starting years.    
     ax.r        = get_tla(pxm.post, i, COLA.scale),
     year   = start.year + age - ea,
     year.r = start.year + age.r - ea, # year of retirement
