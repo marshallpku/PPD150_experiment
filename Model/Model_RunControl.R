@@ -89,14 +89,13 @@ file_Scn_return <- "./Model/Scn_return.xlsx"
 df_returnScn    <- read_ExcelRange(file_Scn_return, sheet = "returnScn" )
 
 
-
 file_ppd <- "DataPPD.RData"
 load(paste0(dir_data_ppd, file_ppd))
 
 ppd_id_all        <- PPD_data$ppd_id
-ppd_id_largePlans <- c(9, 26, 83, 85, 125,
+ppd_id_largePlans <- c(9,  26, 83, 85,  125,
                        72, 84, 86, 140, 150,
-                       10, 28, 78, 88, 108) 
+                       10, 28, 78, 88,  108)
 ppd_id_smallPlans <- setdiff(ppd_id_all, ppd_id_largePlans)
 
 
@@ -104,7 +103,7 @@ ppd_id_smallPlans <- setdiff(ppd_id_all, ppd_id_largePlans)
 #                  Model: Liabilities and cash flow ####
 #********************************************************************************
 
-model_ppd_id  <-  ppd_id_all
+model_ppd_id  <-  88 #  ppd_id_all
 model_liabScn <- "A1"
 
 for(model_ppd_id_ in model_ppd_id){
@@ -154,21 +153,21 @@ source("./Model/Model_Master_liab.R")
 model_sim_liabScn <- "A1"
 
 #model_sim_returnScn <- "planAssumption"
-#model_sim_returnScn <- "return75"
+#model_sim_returnScn <- "return75" ###
 #model_sim_returnScn <- "lowReturn15y"
-#model_sim_returnScn <- "highVol"
-model_sim_returnScn <- c("lowReturn15y", "return75")
+model_sim_returnScn <- "highVol"
+#model_sim_returnScn <- c("return75", "lowReturn15y","highVol")
 
 # model_sim_ppd_id <- ppd_id_largePlans 
 # model_sim_ppd_id <- ppd_id_smallPlans 
-model_sim_ppd_id   <- ppd_id_all
-
+# model_sim_ppd_id   <- c(31,73, 124, 157, 173,153, 85, 72, 140, 88, 150)# consistency issue
+model_sim_ppd_id <- ppd_id_all[-(1:70)] # up to 76
 
 for(model_sim_returnScn_ in model_sim_returnScn){
-  #model_sim_returnScn <- "lowReturn15y"
+    #model_sim_returnScn_ <- "lowReturn15y"
   for(model_sim_ppd_id_ in model_sim_ppd_id){
     # model_sim_ppd_id_  <- 9
-    # model_sim_liabScn <- "A1"
+    # model_sim_liabScn_ <- "A1"
   
   # set output folder
   dir_sim_out <- paste0(dir_outputs_sim, "simScn_", model_sim_liabScn,"_", model_sim_returnScn_, "/" )
@@ -178,18 +177,15 @@ for(model_sim_returnScn_ in model_sim_returnScn){
   load(paste0(dir_outputs_liab, "liabScn_", model_sim_liabScn, "/liab_", model_sim_liabScn, "_", model_sim_ppd_id_, ".RData")) # AggLiab loaded
   AggLiab$planData_list$inputs_singleValues$returnScn <- model_sim_returnScn_
   planData_list <- AggLiab$planData_list
-  
-  planData_list$init_amort_unadj
-  
-  
    
   # load return scenario data
   returnScn_sim <- df_returnScn %>% filter(returnScn == model_sim_returnScn_) 
   
+  # AggLiab$planData_list$init_amort_unadj
+  # AggLiab$planData_list$inputs_singleValues
   
   source("./Model/Model_Master_sim.R")
   }
 }
-
 
 

@@ -337,8 +337,7 @@ largePlans_dataOutputs$largePlans_singleValues_num %>%
          PVB_retired,
          PVFNC_act = PVFNC_active) %>% 
   mutate(AL_retired_old = AL_retired,
-         AL_retired = AL - AL_active,
-         startingSal_growth = infl + prod) %>% 
+         AL_retired = AL - AL_active) %>% 
   ungroup()
         
 inputs_singleValues_largePlans_chr <- 
@@ -393,12 +392,12 @@ inputsSingleValues <-
 #**************************************************************************************
 
 ## Fill missing values: sinle values
-inputs_singleValues_largePlans_num %>% 
+inputsSingleValues  %<>% 
   mutate(prod = ifelse(is.na(prod), mean(prod, na.rm = TRUE), prod),
-         salgrowth_amort = ifelse(is.na(salgrowth_amort), infl + prod, salgrowth_amort))
+         salgrowth_amort    = ifelse(is.na(salgrowth_amort), infl + prod, salgrowth_amort),
+         startingSal_growth = infl + prod)
 
-inputs_singleValues_largePlans_num
-inputs_singleValues_largePlans_chr
+inputsSingleValues$salgrowth_amort
 
 
 ## Fill in missing values: Retirement rates for "10_CA_CA-CALSTRS"
@@ -660,6 +659,36 @@ init_amort_largePlans %<>%
 
 
 inputsSingleValues %>% names
+
+
+#**************************************************************************************
+#            Initial amortization basis: use AV data for selected plans, ####
+#                 and use simple method when estimation is bad                  #
+#**************************************************************************************
+
+# 140 LAFPP
+data_dir  <- "./Inputs_Data_largePlans/"
+init_amort_AV_140 <- read_ExcelRange(paste0(data_dir, "InitAmort_AVData.xlsx"), sheet = "140") %>% 
+  filter(!is.na(balance), balance != 0) %>% 
+  mutate(ppd_id = 140,
+         PlanName = "Los Angeles Fire and Police",
+         year.est = year(year.est))
+
+init_amort_largePlans %<>%
+  filter(ppd_id != 140) %>% 
+  bind_rows(init_amort_AV_140 )
+
+# init_amort_largePlans %>% filter(ppd_id == 140)
+
+
+## 88 Ohio teachers
+init_amort_alt_88 <- 
+init_amort_largePlans %>% filter(ppd_id == 88, year.est == 2016) %>% 
+  mutate(balance = 1, year.remaining = 30)
+  
+init_amort_largePlans %<>%
+  filter(ppd_id != 88) %>% 
+  bind_rows(init_amort_alt_88 )
 
 
 

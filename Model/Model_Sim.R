@@ -1,4 +1,4 @@
-# This script conducts the simulation of the finance of UCRP
+# This script conducts the simulation of the finance
 
 
 run_sim <- function(AggLiab_ = AggLiab,
@@ -27,7 +27,24 @@ run_sim <- function(AggLiab_ = AggLiab,
      AggLiab_$active <- AggLiab_$active.calib
      AggLiab_$la     <- AggLiab_$la.calib
      
+      #AggLiab_$active
+      #AggLiab_$la
   
+  # Temp fix for a bug
+     if(asset_year == 0) asset_year <- 1
+  
+  #*************************************************************************************************************
+  #                                   Adjusting return matrix for init year ####
+  #*************************************************************************************************************  
+  if(init.year < 2016){
+    
+    i.r_sim0 <- i.r[1,1]  
+    r1 <- matrix(rep(c(i.r_sim0, rep(0.05, nsim + 1)), 2016 - init.year), nrow = 2016 - init.year, ncol = nsim + 2, byrow = TRUE)
+    
+    i.r <- rbind(r1, i.r)[1:nyear,] 
+  }
+    
+   
   #*************************************************************************************************************
   #                                     Defining variables in simulation ####
   #*************************************************************************************************************  
@@ -125,6 +142,9 @@ run_sim <- function(AggLiab_ = AggLiab,
   # Vector used in asset smoothing
   s.vector <- seq(0,1,length = asset_year + 1)[-(asset_year+1)]; s.vector  # a vector containing the porportion of 
   
+  
+  
+  
   #*************************************************************************************************************
   #                                 Defining variables in simulation  ####
   #*************************************************************************************************************
@@ -204,6 +224,7 @@ run_sim <- function(AggLiab_ = AggLiab,
    
   init_MA  <- "AL_pct"
   MA_0_pct <- FR_MAV  
+  
   init_AA  <- "AL_pct"
   AA_0_pct <- FR_AAV 
   useAVamort <- TRUE
@@ -244,7 +265,13 @@ run_sim <- function(AggLiab_ = AggLiab,
   # # The amortization basis of year j should be placed in row nrow.initAmort + j - 1. 
   # # save(SC_amort0, file = "SC_amort0.RData")  
   
-  
+  # penSim0$AL
+  # 
+  # SC_amort0
+  # SC_amort0 %>% colSums()
+  # init_amort_raw_$balance %>% sum
+  # init_amort_raw_
+  # 
   #*************************************************************************************************************
   #                                       Simuation  ####
   #*************************************************************************************************************
@@ -254,7 +281,7 @@ run_sim <- function(AggLiab_ = AggLiab,
   
   
   penSim_results <- foreach(k = -1:nsim, .packages = c("dplyr", "tidyr")) %dopar% {
-    #k <- 1
+    # k <- 0
     # initialize
     penSim   <- penSim0
     SC_amort <- SC_amort0
@@ -267,7 +294,7 @@ run_sim <- function(AggLiab_ = AggLiab,
     
     for (j in 1:nyear){
         
-        # j <- 1
+        # j <- 2
         # j <- 60
 
       # MA(j) and EAA(j) 
@@ -301,12 +328,19 @@ run_sim <- function(AggLiab_ = AggLiab,
       
       
       ## Initial unrecognized returns
-      if((init_AA %in% c("AL_pct", "AA0")) & k != -1 & asset_year != 1){
-
+      #if((init_AA %in% c("AL_pct", "AA0")) & k != -1 & asset_year != 1){
+      if(k != -1 & asset_year != 1){
         # Adjusting initila unrecognized returns
-        init_unrecReturns.adj <-  mutate(init_unrecReturns.unadj_, DeferredReturn = DeferredReturn * (penSim$MA[1] - penSim$AA[1])/sum(DeferredReturn),
-                                                                   DeferredReturn.annualTot = sum(DeferredReturn) - cumsum(DeferredReturn) # Initial unrecognized return to be subtracted from AA in each year
-                                         )
+        
+        if(penSim$MA[1] == penSim$AA[1]){
+          init_unrecReturns.adj <-  mutate(init_unrecReturns.unadj_, DeferredReturn.annualTot = 0)
+          
+        } else { 
+          init_unrecReturns.adj <-  mutate(init_unrecReturns.unadj_, DeferredReturn = DeferredReturn * (penSim$MA[1] - penSim$AA[1])/sum(DeferredReturn),
+                                           DeferredReturn.annualTot = sum(DeferredReturn) - cumsum(DeferredReturn) # Initial unrecognized return to be subtracted from AA in each year
+          )
+          }
+        
 
         # Adjust AA for inital unrecognized returns
         if((j - 1 + init.year) %in% init_unrecReturns.adj$year) penSim$AA[j] <- penSim$AA[j] - with(init_unrecReturns.adj, DeferredReturn.annualTot[year == (j - 1 + init.year)])
@@ -359,7 +393,7 @@ run_sim <- function(AggLiab_ = AggLiab,
 
       # ADC(j)
       
-      if(nonNegC){
+      if(nonNegC & k != -1){
         penSim$ADC[j]    <- with(penSim, max(0, NC[j] + SC[j])) 
         penSim$ADC.ER[j] <- with(penSim, ifelse(ADC[j] > EEC[j], ADC[j] - EEC[j], 0)) 
         
@@ -370,7 +404,7 @@ run_sim <- function(AggLiab_ = AggLiab,
         # Allow for negative ADC and C  
         penSim$ADC[j]    <- with(penSim, NC[j] + SC[j]) 
         
-        if(EEC_fixed) {penSim$ADC.ER[j] <- with(penSim, ADC[j] - EEC[j]) # EEC is fixed
+        if(EEC_fixed & k != -1) {penSim$ADC.ER[j] <- with(penSim, ADC[j] - EEC[j]) # EEC is fixed
         # EEC is not fixed
           # 1. when ADC > EEC. Employees pay fixed EEC and employer pays the rest
         } else if(with(penSim, ADC[j] > EEC[j])) {

@@ -71,13 +71,14 @@ source("./Model/Model_InvReturns.R")
 i.r <- gen_returns()
 # i.r[,1:3]
 
+
 #*********************************************************************************************************
 # Simulation ####
 #*********************************************************************************************************
 source("./Model/Model_Sim.R")
 penSim_results <- run_sim()
 
-
+AggLiab$active
 
 #*********************************************************************************************************
 # Risk measures ####
@@ -151,18 +152,18 @@ save(outputs_list, file = paste0(dir_sim_out, "sim_",
 # Showing results ####
 #*********************************************************************************************************
 
-var_display.basic <- c("sim", "year", "FR_MA", "MA","AA", "AL", "NC", "SC","ADC","EEC",  "ERC", "C", "NC_PR", "ERC_PR", 
-                       "AL.act","AL.act.v", "AL.la", "PVFB", "B", "Amort_basis", "i.r")
+var_display.basic <- c("ppd_id", "sim", "year", "FR_MA", "MA","AA", "AL", "NC", "SC","ADC","EEC",  "ERC", "C", "NC_PR", "ERC_PR", 
+                       "AL.act","AL.act.v", "AL.la", "PVFB", "B", "Amort_basis", "i.r", "i")
 
 var_display.demo <- c("sim", "year", "nactives", "nla", "nterms")
 
 penSim_results %>% filter(sim == -1) %>% select(one_of(var_display.basic)) %>% print
 penSim_results %>% filter(sim == 0)  %>% select(one_of(var_display.basic)) %>% print
-penSim_results %>% filter(sim == -1) %>% select(one_of(var_display.demo))  %>% print
+penSim_results %>% filter(sim == 1) %>% select(one_of(var_display.demo))  %>% print
 
 
 
-
+# AggLiab$planData_list$init_amort_unadj$balance %>% sum
 
 
 

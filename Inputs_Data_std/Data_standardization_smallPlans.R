@@ -287,6 +287,7 @@ PPDsingleValues_forSmallPlans%<>%
          amort_openclosed = ifelse(is.na(amort_openclosed), "closed", amort_openclosed),
          amort_year       = ifelse(is.na(amort_year), 25, amort_year),
          asset_year       = ifelse(is.na(asset_year), 5,  asset_year),
+         asset_year       = ifelse(asset_year == 0, 1,  asset_year),
          
          EEC_pct.current = ifelse(is.na(EEC_pct.current), mean(EEC_pct.current, na.rm = TRUE), EEC_pct.current ), 
          EEC_pct.entrants= EEC_pct.current,
@@ -302,7 +303,7 @@ PPDsingleValues_forSmallPlans%<>%
          
          )
 
-# PPDsingleValues_forSmallPlans %>%
+PPDsingleValues_forSmallPlans %>% filter(asset_year == 0)
 #  summarise_all(funs(sum(!is.na(.))))
 
 PPDsingleValues_forSmallPlans %>% select(ppd_id, amort_pctdol)
@@ -451,7 +452,7 @@ unrecReturns_smallPlans <-
            SIMPLIFY = FALSE)
     )
 
-inputsSingleValues_smallPlans %>% filter(amort_year == 0)
+inputsSingleValues_smallPlans  %>% select(ppd_id, asset_year)
 
 
 #**************************************************************************************

@@ -7,8 +7,7 @@ gen_returns <- function( paramlist = planData_list$inputs_singleValues,
    
   # paramlist =  planData_list$inputs_singleValues
   # returnPar = returnScn_sim
-  # seed    = 1234
-
+  
   assign_parmsList(paramlist, envir = environment())
   
   # set parameters
@@ -19,6 +18,7 @@ gen_returns <- function( paramlist = planData_list$inputs_singleValues,
            r.arithMean = r.geoMean + r.sd^2/2)
   
   # generate returns
+  set.seed(1234)
   i.r <- cbind(
     rep(return_planAssumption, nyear),
     with(returnPar, create_returns(r.geoMean, 0, period)),
