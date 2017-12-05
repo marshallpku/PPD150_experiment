@@ -62,8 +62,8 @@ PPD_data$MAV_ppd %>% sum
 
 liabScn  <- "A1"
 #returnScn <- "planAssumption"
-returnScn <- "return75"
-#returnScn <- "lowReturn15y"
+# returnScn <- "return75"
+returnScn <- "lowReturn15y"
 #returnScn <- "highVol"
 
 

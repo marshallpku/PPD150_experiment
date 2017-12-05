@@ -706,6 +706,115 @@ largePlans_dataOutputs$largePlans_salaryScale_byPlan %>%
 
 
 #**************************************************************************************
+#                                 Benefit                                     ####
+#**************************************************************************************
+
+inputsSingleValues %>% 
+  mutate(
+         ## 9
+         # bfactor_current  = ifelse(ppd_id == 9, ),
+         # bfactor_entrants = ifelse(ppd_id == 9, ),
+         # earlyRet_reduction = ifelse(ppd_id == 9, ),
+         cola = ifelse(ppd_id == 9, 0.02, cola),
+         
+         ## 26 
+         # bfactor_current  = ifelse(ppd_id == 26, ),
+         # bfactor_entrants = ifelse(ppd_id == 26, ),
+         earlyRet_reduction = ifelse(ppd_id == 26, 0.05, earlyRet_reduction),
+         cola = ifelse(ppd_id == 26, 0.03, cola),
+         
+         ## 85 
+         # bfactor_current  = ifelse(ppd_id == 85, ),
+         # bfactor_entrants = ifelse(ppd_id == 85, ),
+         #earlyRet_reduction = ifelse(ppd_id == 85, 0.05, earlyRet_reduction),
+         cola = ifelse(ppd_id == 85, 0.03, cola),
+         
+         ## 125 
+         # bfactor_current  = ifelse(ppd_id == 125, ),
+         # bfactor_entrants = ifelse(ppd_id == 125, ),
+         earlyRet_reduction = ifelse(ppd_id == 125, 0.048, earlyRet_reduction),
+         # cola = ifelse(ppd_id == 125, 0.03, cola),
+         
+         ## 83 
+         # bfactor_current  = ifelse(ppd_id == 83, ),
+         # bfactor_entrants = ifelse(ppd_id == 83, ),
+         # earlyRet_reduction = ifelse(ppd_id == 83, 0.048, earlyRet_reduction),
+         cola = ifelse(ppd_id == 83, 0.013, cola),
+         
+         ## 140 
+         # bfactor_current  = ifelse(ppd_id == 140, ),
+         # bfactor_entrants = ifelse(ppd_id == 140, ),
+         # earlyRet_reduction = ifelse(ppd_id == 140, 0.048, earlyRet_reduction),
+         cola = ifelse(ppd_id == 140, 0.03, cola),
+         
+         ## 86 
+         # bfactor_current  = ifelse(ppd_id == 86, ),
+         # bfactor_entrants = ifelse(ppd_id == 86, ),
+         # earlyRet_reduction = ifelse(ppd_id == 86, 0.048, earlyRet_reduction),
+         cola = ifelse(ppd_id == 86, 0.03, cola),
+         EEC_pct.current  = ifelse(ppd_id == 86, 0.1225, EEC_pct.current),
+         EEC_pct.entrants = ifelse(ppd_id == 86, 0.1225, EEC_pct.entrants),
+         
+         
+         ## 150 
+         # bfactor_current  = ifelse(ppd_id == 150, ),
+         # bfactor_entrants = ifelse(ppd_id == 150, ),
+         # earlyRet_reduction = ifelse(ppd_id == 150, 0.048, earlyRet_reduction),
+         # cola = ifelse(ppd_id == 150, 0.03, cola),
+         
+         ## 84 
+         # bfactor_current  = ifelse(ppd_id == 84, ),
+         # bfactor_entrants = ifelse(ppd_id == 84, ),
+         # earlyRet_reduction = ifelse(ppd_id == 84, 0.048, earlyRet_reduction),
+         cola = ifelse(ppd_id == 84, 0.013, cola),
+         
+         ## 72 
+         # bfactor_current  = ifelse(ppd_id   == 72, ),
+         # bfactor_entrants = ifelse(ppd_id   == 72, ),
+         # earlyRet_reduction = ifelse(ppd_id == 72, 0.048, earlyRet_reduction),
+         cola = ifelse(ppd_id == 72, 0, cola),
+         
+         # # 10 
+         # bfactor_current  =   ifelse(ppd_id == 10, ),
+         # bfactor_entrants =   ifelse(ppd_id == 10, ),
+         earlyRet_reduction = ifelse(ppd_id == 10, 0.06, earlyRet_reduction),
+         cola =               ifelse(ppd_id == 10, 0.02, cola),
+         
+         ## 28 
+         bfactor_current  =   ifelse(ppd_id == 28, 0.02, bfactor_current),
+         bfactor_entrants =   ifelse(ppd_id == 28, 0.02, bfactor_entrants),
+         earlyRet_reduction = ifelse(ppd_id == 28, 0.07,earlyRet_reduction),
+         cola =               ifelse(ppd_id == 28, 0.03, cola),
+         
+         ## 108 
+         bfactor_current  =   ifelse(ppd_id == 108, 0.023, bfactor_current),
+         bfactor_entrants =   ifelse(ppd_id == 108, 0.023, bfactor_entrants),
+         earlyRet_reduction = ifelse(ppd_id == 108, 0.02, earlyRet_reduction),
+         cola =               ifelse(ppd_id == 108, 0.03, cola),
+         
+         ## 88 
+         bfactor_current  =   ifelse(ppd_id == 88, 0.022, bfactor_current),
+         bfactor_entrants =   ifelse(ppd_id == 88, 0.022, bfactor_entrants),
+         # earlyRet_reduction = ifelse(ppd_id == 88, 0.02, earlyRet_reduction),
+         cola =               ifelse(ppd_id == 88, 0.02, cola),
+         EEC_pct.current  = ifelse(ppd_id == 88, 0.14, EEC_pct.current),
+         EEC_pct.entrants = ifelse(ppd_id == 88, 0.14, EEC_pct.entrants)
+         
+         
+         ## 78
+         # bfactor_current  =   ifelse(ppd_id == 78, 0.02, bfactor_current),
+         # bfactor_entrants =   ifelse(ppd_id == 78, 0.02, bfactor_entrants),
+         # earlyRet_reduction = ifelse(ppd_id == 78, 0.02, earlyRet_reduction),
+         # cola =               ifelse(ppd_id == 78, 0.02, cola),
+         
+         
+         
+         )
+
+
+
+
+#**************************************************************************************
 #                                   saving data####
 #**************************************************************************************
 

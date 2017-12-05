@@ -103,12 +103,12 @@ ppd_id_smallPlans <- setdiff(ppd_id_all, ppd_id_largePlans)
 #                  Model: Liabilities and cash flow ####
 #********************************************************************************
 
-model_ppd_id  <-  88 #  ppd_id_all
+model_ppd_id  <-  ppd_id_largePlans
 model_liabScn <- "A1"
 
 for(model_ppd_id_ in model_ppd_id){
-  # model_ppd_id_  <- 9
-  # model_liabScn_ <- "A1"
+   # model_ppd_id_  <- 150
+   # model_liabScn_ <- "A1"
   
 # set output folder
 dir_out <- paste0(dir_outputs_liab, "liabScn_", model_liabScn, "/" )
@@ -152,16 +152,16 @@ source("./Model/Model_Master_liab.R")
 
 model_sim_liabScn <- "A1"
 
-#model_sim_returnScn <- "planAssumption"
+model_sim_returnScn <- "planAssumption"
 #model_sim_returnScn <- "return75" ###
 #model_sim_returnScn <- "lowReturn15y"
-model_sim_returnScn <- "highVol"
-#model_sim_returnScn <- c("return75", "lowReturn15y","highVol")
+#model_sim_returnScn <- c("highVol","planAssumption")
+#model_sim_returnScn <- c("return75", "lowReturn15y")
 
 # model_sim_ppd_id <- ppd_id_largePlans 
 # model_sim_ppd_id <- ppd_id_smallPlans 
-# model_sim_ppd_id   <- c(31,73, 124, 157, 173,153, 85, 72, 140, 88, 150)# consistency issue
-model_sim_ppd_id <- ppd_id_all[-(1:70)] # up to 76
+# model_sim_ppd_id   <- ppd_id_smallPlans
+model_sim_ppd_id <- ppd_id_all[-c(1:40)]
 
 for(model_sim_returnScn_ in model_sim_returnScn){
     #model_sim_returnScn_ <- "lowReturn15y"

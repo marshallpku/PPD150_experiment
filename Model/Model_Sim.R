@@ -370,7 +370,7 @@ run_sim <- function(AggLiab_ = AggLiab,
       } else {
         penSim$EUAAL[j] <- with(penSim, (UAAL[j - 1] + NC[j - 1])*(1 + i[j - 1]) - C[j - 1] - Ic[j - 1])
         penSim$LG[j]    <- with(penSim,  UAAL[j] - EUAAL[j])
-        penSim$Amort_basis[j]    <- with(penSim,  LG[j] - (C_ADC[j - 1]) * (1 + i[j - 1]))
+        if(penSim$C_ADC[j-1] < 0) penSim$Amort_basis[j]  <- with(penSim,  LG[j] - (C_ADC[j - 1]) * (1 + i[j - 1])) else penSim$Amort_basis[j] <- with(penSim,  LG[j])
       }   
       
       # # Amortize LG(j)
@@ -429,6 +429,32 @@ run_sim <- function(AggLiab_ = AggLiab,
                               Fixed   = with(penSim, PR_pct_fixed * PR[j])                # Fixed percent of payroll
       ) 
     
+      
+      
+      # TEMP: plan specific ERC rules
+      
+      # 86 OH OPF
+      if(ppd_id == 86 & k!=-1 )  penSim$ERC[j] <- penSim$PR[j] * 0.2161
+      
+      # 72 NJ PFRS
+      # Ramp: full ADC by 2022
+      if(ppd_id == 72 & j <= 6 & k!=-1 )  penSim$ERC[j] <- penSim$ADC.ER[j] * (1/4 + 1/8 * j)
+      
+      
+      # 10 CALSTRS 
+      # cap 20.25%
+      if(ppd_id == 10& k!=-1) penSim$ERC[j] <-  with(penSim, min(ADC.ER[j], 0.2025 * PR[j]))
+      
+      
+      # 108 TX TRS
+      # 7.7%
+      if(ppd_id == 108 & k!=-1)  penSim$ERC[j] <- penSim$PR[j] * 0.077
+      
+      # 88 HO STRS
+      # 7.7%
+      if(ppd_id == 88 & k!=-1)  penSim$ERC[j] <- penSim$PR[j] * 0.14
+      
+      
       
       # C(j)
       penSim$C[j] <- with(penSim, EEC[j] + ERC[j])

@@ -193,8 +193,8 @@ results_risk <- bind_rows(reportData_list_A1_return75$riskMeasure,
 
 reportData_list_A1_planAssumption$results_det %>% filter(ppd_id == 150)
 
-reportData_list_A1_return75$riskMeasure     %>% filter(ppd_id == 0)
-reportData_list_A1_lowReturn15y$riskMeasure %>% filter(ppd_id == 0)
+reportData_list_A1_return75$riskMeasure     %>% filter(ppd_id == 0, year <= 2046)
+reportData_list_A1_lowReturn15y$riskMeasure %>% filter(ppd_id == 0, year <= 2046)
 
 reportData_list_A1_lowReturn15y$riskMeasure   %>% filter(ppd_id == ppd_id_largePlans[13])
 
@@ -278,7 +278,7 @@ fig_FR40less <-  results_risk %>% filter(ppd_id == 0) %>%
   theme_bw() + 
   geom_point(size = 1.5) + 
   geom_line() + 
-  coord_cartesian(ylim = c(0,20)) + 
+  coord_cartesian(ylim = c(0,25)) + 
   scale_y_continuous(breaks = seq(0,200, 5)) +
   scale_x_continuous(breaks = c(2017, seq(2020, 2040, 5), 2046)) + 
   scale_color_manual(values = c(RIG.blue, RIG.red, RIG.red),  name = NULL) + 
@@ -306,7 +306,7 @@ fig_ERChike <- results_risk %>% filter(ppd_id == 0) %>%
   ggplot(aes(x = year, y = ERC_hike, color = returnScn, shape = returnScn)) + theme_bw() + 
   geom_point(size = 1.5) + 
   geom_line() + 
-  coord_cartesian(ylim = c(0,50)) + 
+  coord_cartesian(ylim = c(0,40)) + 
   scale_y_continuous(breaks = seq(0,200, 10)) +
   scale_x_continuous(breaks = c(2017, seq(2020, 2040, 5), 2046)) + 
   scale_color_manual(values = c(RIG.blue, RIG.red, RIG.green, RIG.purple),  name = "") + 
@@ -338,9 +338,9 @@ ggsave("./Analysis/Graphs_report/fig_ERChike.png",  fig_ERChike,  width = 7*1.2,
 ggsave(fig_2riskMeasures , file = "./Analysis/Graphs_report/fig_2riskMeasures.png", width = 11*0.9, height = 5*0.9)
 
 
-x <- PPD_data %>% filter(ppd_id %in% ppd_id_largePlans)
-x$MAV_ppd %>% sum
-x %>% arrange(plantype, MAV_ppd)
 
-y <- PPD_data 
-y$MAV_ppd %>% sum
+
+# x <- reportData_list_A1_return75$results_det %>% filter(B<0)
+
+
+

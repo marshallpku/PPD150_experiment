@@ -95,7 +95,14 @@ get_calibAggLiab <- function( AggLiab_ = AggLiab,
     (target_AL_retirees - sum(B_series_calib1 *1/((1+i)^(0:(length(B_series_calib1 )-1))) * g^(0:(length(B_series_calib1 )-1))))^2
   }
   
-  g_out <- optimize(fun_objective, c(-10, 10))
+  
+  optim_ub <- ifelse(ppd_id %in% c(19, 136, 150), 1.5, 10)
+  optim_lb <- ifelse(ppd_id %in% c(19, 136, 150), 0.5, -10)
+  
+  # optim_ub <- 10
+  # optim_lb <- -10
+  
+  g_out <- optimize(fun_objective, c(optim_lb, optim_ub))
   g <- g_out$minimum
   
   B_series_calib2 <- B_series_calib1 * g^(0:(length(B_series_calib1)-1))
@@ -103,7 +110,7 @@ get_calibAggLiab <- function( AggLiab_ = AggLiab,
   
   
   Err.AL_al.current.init <- AL_Y1 /  target_AL_retirees - 1
-  
+  Err.AL_al.current.init
   
   AggLiab_la.current.init$B.la.sum <- B_series_calib2[-length(B_series_calib2)] 
   AggLiab_la.current.init$ALx.la.sum[1] <- AL_Y1
@@ -121,7 +128,7 @@ get_calibAggLiab <- function( AggLiab_ = AggLiab,
   
   AggLiab_$active.current.calib         <- AggLiab_actives.current  %>% as.matrix
   AggLiab_$active.la.carrent.new.calib  <- AggLiab_la.current.new   %>% as.matrix
-  AggLiab_$active.la.carrent.init.calib <-AggLiab_la.current.init  %>% as.matrix
+  AggLiab_$active.la.carrent.init.calib <- AggLiab_la.current.init  %>% as.matrix
   AggLiab_$active.entrants.calib        <- AggLiab_actives.entrants %>% as.matrix
   AggLiab_$la.entrants.calib            <- AggLiab_la.entrants      %>% as.matrix
   
@@ -144,6 +151,7 @@ get_calibAggLiab <- function( AggLiab_ = AggLiab,
   AggLiab_$calib_factor_actives <- calib_factor_actives
   AggLiab_$calib_factor_benY1   <- calib_factor_benY1
   AggLiab_$calib_g              <- g
+  AggLiab_$calib_errorAL        <- Err.AL_al.current.init
   
   AggLiab_$planData_list <- planData_list_
   
