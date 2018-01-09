@@ -161,7 +161,7 @@ model_sim_returnScn <- "planAssumption"
 # model_sim_ppd_id <- ppd_id_largePlans 
 # model_sim_ppd_id <- ppd_id_smallPlans 
 # model_sim_ppd_id   <- ppd_id_smallPlans
-model_sim_ppd_id <- ppd_id_all[-c(1:40)]
+model_sim_ppd_id <- 1 #ppd_id_all[-c(1:40)]
 
 for(model_sim_returnScn_ in model_sim_returnScn){
     #model_sim_returnScn_ <- "lowReturn15y"
