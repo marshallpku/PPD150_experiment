@@ -67,6 +67,8 @@ library("readxl")
 library("XLConnect") # slow but convenient because it reads ranges; NOTE: I had to install Java 64-bit on Windows 10 64-bit to load properly
 # library(xlsx)
 library("btools")
+library(pdata)
+
 options(dplyr.print_min = 60) # default is 10
 
 source("Functions.R")
@@ -98,6 +100,8 @@ ppd_id_largePlans <- c(9,  26, 83, 85,  125,
                        10, 28, 78, 88,  108)
 ppd_id_smallPlans <- setdiff(ppd_id_all, ppd_id_largePlans)
 
+ppd_id_closed <-  c(3, 4, 24, 54, 55, 124, 154, 157)
+
 
 #********************************************************************************                          
 #                  Model: Liabilities and cash flow ####
@@ -107,33 +111,32 @@ model_ppd_id  <-  ppd_id_largePlans
 model_liabScn <- "A1"
 
 for(model_ppd_id_ in model_ppd_id){
-   # model_ppd_id_  <- 150
-   # model_liabScn_ <- "A1"
-  
-# set output folder
-dir_out <- paste0(dir_outputs_liab, "liabScn_", model_liabScn, "/" )
-if(!dir.exists(dir_out)) dir.create(dir_out)
 
-# load plan data
-load(paste0(dir_data_std, "planData_std_", model_ppd_id_, ".RData"))
-planData_list <- get(paste0("planData_std_", model_ppd_id_ ))
+    # set output folder
+    dir_out <- paste0(dir_outputs_liab, "liabScn_", model_liabScn, "/" )
+    if(!dir.exists(dir_out)) dir.create(dir_out)
 
-# load scenario data
-list_liabScn <- df_liabScn %>% filter(liabScn == model_liabScn) %>% unclass
+    # load plan data
+    load(paste0(dir_data_std, "planData_std_", model_ppd_id_, ".RData"))
+    planData_list <- get(paste0("planData_std_", model_ppd_id_ ))
+    
+    # load scenario data
+    list_liabScn <- df_liabScn %>% filter(liabScn == model_liabScn) %>% unclass
 
-# combine data
-planData_list$inputs_singleValues <- 
-  c(list_liabScn, planData_list$inputs_singleValues)
+    # combine data
+    planData_list$inputs_singleValues <- 
+      c(list_liabScn, planData_list$inputs_singleValues)
 
 
-# Derived values
-planData_list$inputs_singleValues$init.year <- planData_list$inputs_singleValues$fy_end
-planData_list$inputs_singleValues$range_age <- with(planData_list$inputs_singleValues, age_min:age_max)
-planData_list$inputs_singleValues$range_ea  <- with(planData_list$inputs_singleValues, ea_min:ea_max)
+    # Derived values
+    planData_list$inputs_singleValues$init.year <- planData_list$inputs_singleValues$fy_end
+    planData_list$inputs_singleValues$range_age <- with(planData_list$inputs_singleValues, age_min:age_max)
+    planData_list$inputs_singleValues$range_ea  <- with(planData_list$inputs_singleValues, ea_min:ea_max)
 
-# browser()
+    # Force no_entrants = TRUE for closed plan
+    if(planData_list$inputs_singleValues$ppd_id %in% ppd_id_closed) planData_list$inputs_singleValues$no_entrants <- TRUE
 
-source("./Model/Model_Master_liab.R")
+    source("./Model/Model_Master_liab.R")
 }
 
 
@@ -165,27 +168,48 @@ model_sim_ppd_id <- ppd_id_all[-c(1:40)]
 
 for(model_sim_returnScn_ in model_sim_returnScn){
     #model_sim_returnScn_ <- "lowReturn15y"
-  for(model_sim_ppd_id_ in model_sim_ppd_id){
-    # model_sim_ppd_id_  <- 9
-    # model_sim_liabScn_ <- "A1"
   
-  # set output folder
-  dir_sim_out <- paste0(dir_outputs_sim, "simScn_", model_sim_liabScn,"_", model_sim_returnScn_, "/" )
-  if(!dir.exists(dir_sim_out)) dir.create(dir_sim_out)
+    for(model_sim_ppd_id_ in model_sim_ppd_id){
+      # model_sim_ppd_id_  <- 9
+      # model_sim_liabScn_ <- "A1"
   
-  # load liability data and plan data list
-  load(paste0(dir_outputs_liab, "liabScn_", model_sim_liabScn, "/liab_", model_sim_liabScn, "_", model_sim_ppd_id_, ".RData")) # AggLiab loaded
-  AggLiab$planData_list$inputs_singleValues$returnScn <- model_sim_returnScn_
-  planData_list <- AggLiab$planData_list
+    # set output folder
+    dir_sim_out <- paste0(dir_outputs_sim, "simScn_", model_sim_liabScn,"_", model_sim_returnScn_, "/" )
+    if(!dir.exists(dir_sim_out)) dir.create(dir_sim_out)
+  
+    # load liability data and plan data list
+    load(paste0(dir_outputs_liab, "liabScn_", model_sim_liabScn, "/liab_", model_sim_liabScn, "_", model_sim_ppd_id_, ".RData")) # AggLiab loaded
+    AggLiab$planData_list$inputs_singleValues$returnScn <- model_sim_returnScn_
+    planData_list <- AggLiab$planData_list
    
-  # load return scenario data
-  returnScn_sim <- df_returnScn %>% filter(returnScn == model_sim_returnScn_) 
+    # load return scenario data
+    returnScn_sim <- df_returnScn %>% filter(returnScn == model_sim_returnScn_) 
   
-  # AggLiab$planData_list$init_amort_unadj
-  # AggLiab$planData_list$inputs_singleValues
+    # AggLiab$planData_list$init_amort_unadj
+    # AggLiab$planData_list$inputs_singleValues
   
-  source("./Model/Model_Master_sim.R")
-  }
+    source("./Model/Model_Master_sim.R")
+    }
 }
+
+
+
+
+#********************************************************************************                          
+#                             Misc ####
+#********************************************************************************
+
+# PPD_data %>% str
+
+
+
+
+
+
+
+
+
+
+
 
 
