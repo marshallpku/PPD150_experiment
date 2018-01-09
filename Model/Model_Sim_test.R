@@ -271,7 +271,23 @@ run_sim <- function(AggLiab_ = AggLiab,
   # SC_amort0 %>% colSums()
   # init_amort_raw_$balance %>% sum
   # init_amort_raw_
-  # 
+  
+  
+  
+  #*************************************************************************************************************
+  #                                       Adjusting deferred returns   ####
+  #*************************************************************************************************************
+  
+    if(MA.year1 == AA.year1){
+      init_unrecReturns.adj <-  mutate(init_unrecReturns.unadj_, DeferredReturn.annualTot = 0)
+      
+    } else { 
+      init_unrecReturns.adj <-  mutate(init_unrecReturns.unadj_, DeferredReturn = DeferredReturn * (MA.year1 - AA.year1)/sum(DeferredReturn),
+                                       DeferredReturn.annualTot = sum(DeferredReturn) - cumsum(DeferredReturn) # Initial unrecognized return to be subtracted from AA in each year
+      )
+    }
+    
+
   #*************************************************************************************************************
   #                                       Simuation  ####
   #*************************************************************************************************************
@@ -332,14 +348,14 @@ run_sim <- function(AggLiab_ = AggLiab,
       if(k != -1 & asset_year != 1){
         # Adjusting initila unrecognized returns
         
-        if(penSim$MA[1] == penSim$AA[1]){
-          init_unrecReturns.adj <-  mutate(init_unrecReturns.unadj_, DeferredReturn.annualTot = 0)
-          
-        } else { 
-          init_unrecReturns.adj <-  mutate(init_unrecReturns.unadj_, DeferredReturn = DeferredReturn * (penSim$MA[1] - penSim$AA[1])/sum(DeferredReturn),
-                                           DeferredReturn.annualTot = sum(DeferredReturn) - cumsum(DeferredReturn) # Initial unrecognized return to be subtracted from AA in each year
-          )
-          }
+        # if(penSim$MA[1] == penSim$AA[1]){
+        #   init_unrecReturns.adj <-  mutate(init_unrecReturns.unadj_, DeferredReturn.annualTot = 0)
+        #   
+        # } else { 
+        #   init_unrecReturns.adj <-  mutate(init_unrecReturns.unadj_, DeferredReturn = DeferredReturn * (penSim$MA[1] - penSim$AA[1])/sum(DeferredReturn),
+        #                                    DeferredReturn.annualTot = sum(DeferredReturn) - cumsum(DeferredReturn) # Initial unrecognized return to be subtracted from AA in each year
+        #   )
+        #   }
         
 
         # Adjust AA for inital unrecognized returns
