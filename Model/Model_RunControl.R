@@ -67,7 +67,7 @@ library("readxl")
 library("XLConnect") # slow but convenient because it reads ranges; NOTE: I had to install Java 64-bit on Windows 10 64-bit to load properly
 # library(xlsx)
 library("btools")
-library(pdata)
+# library(pdata)
 
 options(dplyr.print_min = 60) # default is 10
 
@@ -193,13 +193,6 @@ for(model_sim_returnScn_ in model_sim_returnScn){
 }
 
 
-
-
-#********************************************************************************                          
-#                             Misc ####
-#********************************************************************************
-
-# PPD_data %>% str
 
 
 
