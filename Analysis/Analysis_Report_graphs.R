@@ -92,7 +92,6 @@ ppd_id_smallPlans <- setdiff(ppd_id_all, ppd_id_largePlans)
 
 
 
-
 #********************************************************************************                          
 #                             Loading files                                  ####
 #********************************************************************************
@@ -189,17 +188,9 @@ results_risk <- bind_rows(reportData_list_A1_return75$riskMeasure,
                                           labels = c('Scenario 1\n"7.5 percent expected return"', 'Scenario 2\n"15 Years of Low Returns"'))) %>% 
                 filter(year <= 2046)
                     
-                           #reportData_list_A1_highVol$results_det)
-
-reportData_list_A1_planAssumption$results_det %>% filter(ppd_id == 150)
 
 reportData_list_A1_return75$riskMeasure     %>% filter(ppd_id == 0, year <= 2046)
 reportData_list_A1_lowReturn15y$riskMeasure %>% filter(ppd_id == 0, year <= 2046)
-
-reportData_list_A1_lowReturn15y$riskMeasure   %>% filter(ppd_id == ppd_id_largePlans[13])
-
-results_risk %>% filter(ppd_id == 0) %>% kable()
-
 
 
 # Distribution of funded ratio 

@@ -107,7 +107,7 @@ ppd_id_closed <-  c(3, 4, 24, 54, 55, 124, 154, 157)
 #                  Model: Liabilities and cash flow ####
 #********************************************************************************
 
-model_ppd_id  <-  ppd_id_largePlans
+model_ppd_id  <- ppd_id_closed
 model_liabScn <- "A1"
 
 for(model_ppd_id_ in model_ppd_id){
@@ -155,16 +155,16 @@ for(model_ppd_id_ in model_ppd_id){
 
 model_sim_liabScn <- "A1"
 
-model_sim_returnScn <- "planAssumption"
+#model_sim_returnScn <- "planAssumption"
 #model_sim_returnScn <- "return75" ###
 #model_sim_returnScn <- "lowReturn15y"
 #model_sim_returnScn <- c("highVol","planAssumption")
-#model_sim_returnScn <- c("return75", "lowReturn15y")
+model_sim_returnScn <- c("return75", "lowReturn15y", "highVol")
 
 # model_sim_ppd_id <- ppd_id_largePlans 
 # model_sim_ppd_id <- ppd_id_smallPlans 
 # model_sim_ppd_id   <- ppd_id_smallPlans
-model_sim_ppd_id <- 1 #ppd_id_all[-c(1:40)]
+model_sim_ppd_id <- ppd_id_closed
 
 for(model_sim_returnScn_ in model_sim_returnScn){
     #model_sim_returnScn_ <- "lowReturn15y"

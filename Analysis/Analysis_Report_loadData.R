@@ -34,7 +34,6 @@ options(dplyr.print_min = 60) # default is 10
 source("Functions.R")
 
 
-
 #********************************************************************************                          
 #                  Global settings ####
 #********************************************************************************
@@ -54,17 +53,17 @@ ppd_id_largePlans <- c(9, 26, 83, 85, 125,
                        10, 28, 78, 88, 108) 
 ppd_id_smallPlans <- setdiff(ppd_id_all, ppd_id_largePlans)
 
-PPD_data$MAV_ppd %>% sum
+# PPD_data$MAV_ppd %>% sum
 
 #********************************************************************************                          
 #                             Loading files                                  ####
 #********************************************************************************
 
 liabScn  <- "A1"
-#returnScn <- "planAssumption"
-# returnScn <- "return75"
-returnScn <- "lowReturn15y"
-#returnScn <- "highVol"
+# returnScn <- "planAssumption"
+returnScn <- "return75"
+# returnScn <- "lowReturn15y"
+# returnScn <- "highVol"
 
 
 # Define file names
