@@ -318,15 +318,23 @@ fig_2riskMeasures %>% grid.draw()
 
 
 
-
-ggsave("./Analysis/Graphs_report/fig_FRdist.png", fig_FRdist, width = 10, height = 5)
+# .png
+ggsave("./Analysis/Graphs_report/fig_FRdist.png",     fig_FRdist, width = 10, height = 5)
 ggsave("./Analysis/Graphs_report/fig_ERC_PRdist.png", fig_ERC_PR_dist, width = 10, height = 5)
 
 ggsave("./Analysis/Graphs_report/fig_FR40less.png", fig_FR40less, width = 7*1.2, height = 5*1.2)
 ggsave("./Analysis/Graphs_report/fig_ERChike.png",  fig_ERChike,  width = 7*1.2, height = 5*1.2)
 
-
 ggsave(fig_2riskMeasures , file = "./Analysis/Graphs_report/fig_2riskMeasures.png", width = 11*0.9, height = 5*0.9)
+
+# .pdf
+ggsave("./Analysis/Graphs_report/fig_FRdist.pdf",     fig_FRdist, width = 10, height = 5)
+ggsave("./Analysis/Graphs_report/fig_ERC_PRdist.pdf", fig_ERC_PR_dist, width = 10, height = 5)
+
+ggsave("./Analysis/Graphs_report/fig_FR40less.pdf", fig_FR40less, width = 7*1.2, height = 5*1.2)
+ggsave("./Analysis/Graphs_report/fig_ERChike.pdf",  fig_ERChike,  width = 7*1.2, height = 5*1.2)
+
+ggsave(fig_2riskMeasures , file = "./Analysis/Graphs_report/fig_2riskMeasures.pdf", width = 11*0.9, height = 5*0.9)
 
 
 
